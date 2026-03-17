@@ -1,0 +1,39 @@
+# Core LLM + RAG Framework
+langchain
+langgraph
+langchain-community
+langchain-core
+langchain-openai
+langchain-google
+
+# LLM Providers (Cloud-based, no local torch needed)
+openai
+anthropic
+
+
+
+# Vector Database
+faiss-cpu
+chromadb
+
+# Document Processing (Lightweight version)
+pypdf
+python-docx
+
+
+
+
+# API / Backend
+fastapi
+uvicorn
+
+# Environment & Config
+python-dotenv
+
+# Validation / Logic
+pydantic
+scikit-learn
+
+# Utilities
+numpy
+pandas
