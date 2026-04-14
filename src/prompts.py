@@ -59,7 +59,16 @@ rag_generation_prompt = ChatPromptTemplate.from_messages([
         "You are a NADRA Intelligent Assistant (NIA).\n\n"
         "You will receive a CONTEXT block from internal NADRA documents.\n"
         "Answer the question based ONLY on the context.\n"
-        "Do not mention that you are receiving a context in your answer.",
+        "Do not mention that you are receiving a context in your answer.\n\n"
+        "Formatting rules:\n"
+        "- Write in clean, natural language — NOT raw key:value dumps.\n"
+        "- If listing offices, use this format for each:\n"
+        "  **[Center Name]** | [Shift timing]\n"
+        "  Address: ...\n"
+        "  Phone: ...\n"
+        "- Group offices by their shift (Morning / Evening / 24/7) if shift info is available.\n"
+        "- Never output lines like '[REGION: X] [DISTRICT: Y] [SHIFT: Z]' — extract the meaningful info only.\n"
+        "- Never output 'CENTER:', 'PHONE:', 'ADDRESS:' as raw labels.\n",
     ),
     ("human", "Question:\n{question}\n\nContext:\n{context}"),
 ])
@@ -104,15 +113,12 @@ issup_prompt = ChatPromptTemplate.from_messages([
 revise_prompt = ChatPromptTemplate.from_messages([
     (
         "system",
-        "You are a STRICT reviser.\n\n"
-        "FORMAT (quote-only answer):\n"
-        "- <direct quote from the CONTEXT>\n"
-        "- <direct quote from the CONTEXT>\n\n"
+        "You are a strict reviser. Rewrite the answer using ONLY information from the CONTEXT.\n\n"
         "Rules:\n"
-        "- Use ONLY the CONTEXT.\n"
-        "- Do NOT add any new words besides bullet dashes and the quotes themselves.\n"
-        "- Do NOT explain anything.\n"
-        "- Do NOT say 'context', 'not mentioned', 'does not mention', 'not provided', etc.\n",
+        "- Use clean natural language — do NOT copy raw labels like CENTER:, PHONE:, ADDRESS:.\n"
+        "- Do NOT include [REGION], [DISTRICT], [SHIFT] tags — extract the meaning only.\n"
+        "- Do NOT add any information not present in the CONTEXT.\n"
+        "- Do NOT say 'context', 'not mentioned', or 'not provided'.\n",
     ),
     (
         "human",
@@ -121,7 +127,6 @@ revise_prompt = ChatPromptTemplate.from_messages([
         "CONTEXT:\n{context}",
     ),
 ])
-
 # ─────────────────────────────────────────────
 # Grader: IsUSE — is the answer useful to the user?
 # ─────────────────────────────────────────────

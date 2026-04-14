@@ -1,6 +1,9 @@
 from graph import app
 
 
+import warnings
+warnings.filterwarnings("ignore")
+
 if __name__ == "__main__":
     question = input("Ask your question: ")
 
@@ -23,6 +26,4 @@ if __name__ == "__main__":
 
     print("\nFinal Answer:\n")
     print(result["answer"])
-    print("other information")
-    print()
-    print(result)
+   
