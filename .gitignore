@@ -2,10 +2,11 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+.claude
+.env
 # C extensions
 *.so
-
+nadra_info.txt
 # Distribution / packaging
 .Python
 build/
