@@ -2,8 +2,8 @@ from typing import List
 
 from langchain_core.documents import Document
 
-from state import MyState
-from prompts import (
+from src.state import MyState
+from src.prompts import (
     decide_retrieval_prompt,
     direct_generation_prompt,
     is_relevant_prompt,
@@ -13,8 +13,8 @@ from prompts import (
     isuse_prompt,
     rewrite_for_retrieval_prompt,
 )
-from routing import llm, decision_llm, relevance_llm, issup_llm, isuse_llm, rewrite_llm
-from ingestion import retriever
+from src.routing import llm, decision_llm, relevance_llm, issup_llm, isuse_llm, rewrite_llm
+from src.ingestion import retriever
 
 
 # ─────────────────────────────────────────────

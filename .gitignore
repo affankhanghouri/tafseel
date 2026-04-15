@@ -5,6 +5,9 @@ __pycache__/
 .claude
 .env
 # C extensions
+parent_chunks.db-shm
+parent_chunks.db-wal
+nia_chat.html
 *.so
 nadra_info.txt
 # Distribution / packaging

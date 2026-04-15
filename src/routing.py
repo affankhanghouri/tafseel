@@ -4,15 +4,15 @@ from typing import Literal
 # BUG FIX #1: was "langchain_graphraphroq" (typo) — correct package is "langchain_groq"
 from langchain_groq import ChatGroq
 
-from models import (
+from src.models import (
     RetrievalDecision,
     RelevanceDecision,
     IsSUPDecision,
     IsUSEDecision,
     RewriteDecision,
 )
-from state import MyState
-from config import MAX_RETRIES, MAX_REWRITE_TRIES
+from src.state import MyState
+from src.config import MAX_RETRIES, MAX_REWRITE_TRIES
 
 # ─────────────────────────────────────────────
 # LLM + structured output variants

@@ -55,7 +55,7 @@ from qdrant_client.models import (
     VectorParams,
 )
 
-from config import (
+from src.config import (
     EMBEDDING_DIMENSIONS,
     EMBEDDING_MODEL,
     PARENT_CHUNK_OVERLAP,

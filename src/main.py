@@ -1,4 +1,4 @@
-from graph import app
+from src.graph import app
 
 
 import warnings
