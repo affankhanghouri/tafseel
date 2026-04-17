@@ -14,7 +14,7 @@ from src.prompts import (
     rewrite_for_retrieval_prompt,
 )
 from src.routing import llm, decision_llm, relevance_llm, issup_llm, isuse_llm, rewrite_llm
-from src.ingestion import retriever
+from src.ingestion import get_retriever, retriever
 
 
 # ─────────────────────────────────────────────
@@ -44,7 +44,7 @@ def generate_direct(state: MyState):
 # ─────────────────────────────────────────────
 def retrieve(state: MyState):
     query = state.get("retrieval_query") or state["question"]
-    retrieved_docs = retriever.invoke(query)
+    retrieved_docs = get_retriever().invoke(query) 
     return {"docs": retrieved_docs}
 
 

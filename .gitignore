@@ -12,6 +12,7 @@ nia_chat.html
 nadra_info.txt
 # Distribution / packaging
 .Python
+.vscode
 build/
 develop-eggs/
 dist/
