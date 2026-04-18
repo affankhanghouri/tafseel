@@ -1,0 +1,40 @@
+name: Deploy & Ingest
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2 and run ingestion
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/tafseel
+
+            # Pull latest code
+            git pull origin main
+
+            # Activate virtualenv
+            source venv/bin/activate
+
+            # Install any new dependencies
+            pip install -r requirements.txt --quiet
+
+            # Run ingestion (skips already-ingested chunks automatically)
+            python ingest_all.py
+
+            # Restart FastAPI to pick up any code changes
+            sudo systemctl restart fastapi.service
+
+            echo "Deploy complete"
