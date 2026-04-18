@@ -2,7 +2,9 @@
 ingestion.py — Cloud Edition (Supabase + Qdrant Cloud)
 ======================================================
 Supports multiple files in data/ folder.
-Tracks ingested chunks by content hash — skips duplicates on re-run.
+Tracks ingested files by whole-file hash.
+If file unchanged → skip entirely.
+If file changed → delete old vectors → re-ingest fresh.
 """
 
 import glob
@@ -23,7 +25,7 @@ from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, FieldCondition, Filter, MatchValue, PointStruct, VectorParams
 
 from src.config import (
     EMBEDDING_DIMENSIONS,
@@ -44,60 +46,39 @@ logger = logging.getLogger(__name__)
 
 embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
 
-# Global connection pool for PostgreSQL (thread-safe)
 _pg_pool = None
 
 
 def _make_qdrant_client() -> QdrantClient:
-    """Connects to Qdrant Cloud with increased timeout for uploads"""
     if QDRANT_URL:
         logger.info("Connecting to Qdrant Cloud...")
-        return QdrantClient(
-            url=QDRANT_URL,
-            api_key=QDRANT_API_KEY,
-            timeout=60
-        )
+        return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=60)
     logger.info("Using local Qdrant")
     return QdrantClient(path="qdrant_db")
 
 
 def _ensure_collection(client: QdrantClient) -> None:
-    """Creates collection if it doesn't exist"""
     try:
         client.get_collection(QDRANT_COLLECTION)
         logger.info(f"Collection '{QDRANT_COLLECTION}' exists")
     except Exception:
         logger.info(f"Creating collection '{QDRANT_COLLECTION}'...")
-        try:
-            client.create_collection(
-                collection_name=QDRANT_COLLECTION,
-                vectors_config=VectorParams(
-                    size=EMBEDDING_DIMENSIONS,
-                    distance=Distance.COSINE,
-                ),
-            )
-            logger.info("Collection created successfully")
-        except Exception as create_err:
-            logger.error(f"Failed to create collection: {create_err}")
-            raise
+        client.create_collection(
+            collection_name=QDRANT_COLLECTION,
+            vectors_config=VectorParams(size=EMBEDDING_DIMENSIONS, distance=Distance.COSINE),
+        )
+        logger.info("Collection created successfully")
 
 
 def _get_pg_pool():
-    """Lazy initialization of PostgreSQL connection pool"""
     global _pg_pool
     if _pg_pool is None:
-        _pg_pool = SimpleConnectionPool(
-            1, 5,
-            SUPABASE_DB_URL,
-            sslmode='require'
-        )
+        _pg_pool = SimpleConnectionPool(1, 5, SUPABASE_DB_URL, sslmode='require')
     return _pg_pool
 
 
 def _init_tables(conn) -> None:
-    """Create all required tables if they don't exist"""
     with conn.cursor() as cur:
-        # Parent chunks table
         cur.execute("""
             CREATE TABLE IF NOT EXISTS parent_chunks (
                 id TEXT PRIMARY KEY,
@@ -106,51 +87,64 @@ def _init_tables(conn) -> None:
                 metadata JSONB NOT NULL DEFAULT '{}'
             )
         """)
-        cur.execute(
-            "CREATE INDEX IF NOT EXISTS idx_parent_chunks_id ON parent_chunks(id)"
-        )
-        # Ingestion tracking table — stores hash of each parent chunk
-        # so we never re-ingest the same content twice
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_parent_chunks_id ON parent_chunks(id)")
+
+        # File-level hash tracking
         cur.execute("""
-            CREATE TABLE IF NOT EXISTS ingested_hashes (
-                chunk_hash TEXT PRIMARY KEY,
-                source TEXT NOT NULL,
+            CREATE TABLE IF NOT EXISTS ingested_files (
+                source TEXT PRIMARY KEY,
+                file_hash TEXT NOT NULL,
                 ingested_at TIMESTAMP DEFAULT NOW()
             )
         """)
     conn.commit()
 
 
-def _chunk_hash(text: str) -> str:
-    """MD5 hash of chunk text — used to detect duplicates"""
-    return hashlib.md5(text.encode("utf-8")).hexdigest()
+def _file_hash(file_path: str) -> str:
+    """MD5 hash of entire file content"""
+    with open(file_path, "rb") as f:
+        return hashlib.md5(f.read()).hexdigest()
 
 
-def _is_already_ingested(conn, chunk_hash: str) -> bool:
-    """Check if this chunk hash exists in tracking table"""
+def _get_stored_hash(conn, source: str) -> Optional[str]:
     with conn.cursor() as cur:
-        cur.execute(
-            "SELECT 1 FROM ingested_hashes WHERE chunk_hash = %s",
-            (chunk_hash,)
-        )
-        return cur.fetchone() is not None
+        cur.execute("SELECT file_hash FROM ingested_files WHERE source = %s", (source,))
+        row = cur.fetchone()
+        return row[0] if row else None
 
 
-def _mark_as_ingested(conn, chunk_hash: str, source: str) -> None:
-    """Record this hash as ingested"""
+def _set_stored_hash(conn, source: str, file_hash: str) -> None:
     with conn.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO ingested_hashes (chunk_hash, source)
+        cur.execute("""
+            INSERT INTO ingested_files (source, file_hash)
             VALUES (%s, %s)
-            ON CONFLICT (chunk_hash) DO NOTHING
-            """,
-            (chunk_hash, source)
-        )
+            ON CONFLICT (source) DO UPDATE SET
+                file_hash = EXCLUDED.file_hash,
+                ingested_at = NOW()
+        """, (source, file_hash))
+
+
+def _delete_file_data(conn, qdrant_client: QdrantClient, source: str) -> None:
+    """Delete all vectors and parent chunks for a given source file"""
+    logger.info(f"  Deleting old data for: {source}")
+
+    # Delete from Qdrant by source filter
+    qdrant_client.delete(
+        collection_name=QDRANT_COLLECTION,
+        points_selector=Filter(
+            must=[FieldCondition(key="source", match=MatchValue(value=source))]
+        ),
+    )
+
+    # Delete from Supabase
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM parent_chunks WHERE source = %s", (source,))
+
+    conn.commit()
+    logger.info(f"  Old data deleted for: {source}")
 
 
 def _store_parent(conn, parent_id: str, text: str, source: str, metadata: dict) -> None:
-    """Store parent chunk in Supabase"""
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -166,12 +160,8 @@ def _store_parent(conn, parent_id: str, text: str, source: str, metadata: dict) 
 
 
 def _fetch_parent(conn, parent_id: str) -> Optional[dict]:
-    """Fetch parent from Supabase"""
     with conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute(
-            "SELECT text, source, metadata FROM parent_chunks WHERE id = %s",
-            (parent_id,)
-        )
+        cur.execute("SELECT text, source, metadata FROM parent_chunks WHERE id = %s", (parent_id,))
         row = cur.fetchone()
         if row:
             return {
@@ -182,14 +172,29 @@ def _fetch_parent(conn, parent_id: str) -> Optional[dict]:
         return None
 
 
-def ingest_file(source_path: str, pg_conn, qdrant_client: QdrantClient, batch_size: int = 20) -> dict:
+def ingest_file(file_path: str, pg_conn, qdrant_client: QdrantClient, batch_size: int = 20) -> str:
     """
-    Ingest a single file. Skips chunks already ingested (by hash).
-    Returns stats: {total, skipped, new}
+    Ingest a single file using file-level hash tracking.
+    Returns: 'skipped', 'new', or 'updated'
     """
-    logger.info(f"--- Ingesting: {source_path} ---")
+    source = file_path
+    current_hash = _file_hash(file_path)
+    stored_hash = _get_stored_hash(pg_conn, source)
 
-    raw_docs = TextLoader(source_path, encoding="utf-8").load()
+    if stored_hash == current_hash:
+        logger.info(f"  Skipping (unchanged): {file_path}")
+        return 'skipped'
+
+    if stored_hash is not None:
+        # File changed — delete old data first
+        logger.info(f"  File changed: {file_path} — re-ingesting...")
+        _delete_file_data(pg_conn, qdrant_client, source)
+        status = 'updated'
+    else:
+        logger.info(f"  New file: {file_path} — ingesting...")
+        status = 'new'
+
+    raw_docs = TextLoader(file_path, encoding="utf-8").load()
 
     parent_splitter = RecursiveCharacterTextSplitter(
         chunk_size=PARENT_CHUNK_SIZE,
@@ -207,30 +212,16 @@ def ingest_file(source_path: str, pg_conn, qdrant_client: QdrantClient, batch_si
 
     pending_points: List[PointStruct] = []
     total_children = 0
-    skipped = 0
-    new_parents = 0
 
     for i, parent_doc in enumerate(parent_docs):
-        chunk_hash = _chunk_hash(parent_doc.page_content)
-
-        # Skip if already ingested
-        if _is_already_ingested(pg_conn, chunk_hash):
-            skipped += 1
-            continue
-
         parent_id = str(uuid.uuid4())
-        source = parent_doc.metadata.get("source", source_path)
-
-        # Store parent in Supabase
+        parent_doc.metadata["source"] = source
         _store_parent(pg_conn, parent_id, parent_doc.page_content, source, parent_doc.metadata)
-        _mark_as_ingested(pg_conn, chunk_hash, source)
-        new_parents += 1
 
         if i % 10 == 0:
             pg_conn.commit()
             logger.info(f"  Processed {i}/{len(parent_docs)} parents...")
 
-        # Create and embed children
         child_docs = child_splitter.split_documents([parent_doc])
         if not child_docs:
             continue
@@ -258,26 +249,22 @@ def ingest_file(source_path: str, pg_conn, qdrant_client: QdrantClient, batch_si
                 logger.info(f"  Upserted {total_children} children total...")
                 pending_points.clear()
 
-    # Flush remaining
     if pending_points:
         _upsert_with_retry(qdrant_client, pending_points)
 
+    _set_stored_hash(pg_conn, source, current_hash)
     pg_conn.commit()
 
-    stats = {
-        "total": len(parent_docs),
-        "skipped": skipped,
-        "new": new_parents,
-        "children": total_children,
-    }
-    logger.info(f"  Done: {new_parents} new | {skipped} skipped | {total_children} children embedded")
-    return stats
+    logger.info(f"  Done: {len(parent_docs)} parents | {total_children} children embedded")
+    return status
 
 
 def ingest_all(data_dir: str = "data", batch_size: int = 20) -> None:
     """
     Ingest all .txt files in data_dir.
-    Skips chunks already ingested — safe to re-run at any time.
+    - Unchanged files → skipped entirely
+    - Changed files → old vectors deleted → re-ingested fresh (no duplicates)
+    - New files → ingested fresh
     """
     logger.info("=== Starting Multi-File Ingestion ===")
 
@@ -295,19 +282,18 @@ def ingest_all(data_dir: str = "data", batch_size: int = 20) -> None:
     qdrant_client = _make_qdrant_client()
     _ensure_collection(qdrant_client)
 
-    total_stats = {"total": 0, "skipped": 0, "new": 0, "children": 0}
+    results = {'new': 0, 'updated': 0, 'skipped': 0}
 
     try:
         for file_path in txt_files:
-            stats = ingest_file(file_path, pg_conn, qdrant_client, batch_size)
-            for k in total_stats:
-                total_stats[k] += stats[k]
+            logger.info(f"--- Checking: {file_path} ---")
+            status = ingest_file(file_path, pg_conn, qdrant_client, batch_size)
+            results[status] += 1
 
         logger.info("=== Ingestion Complete ===")
-        logger.info(f"  Total parents : {total_stats['total']}")
-        logger.info(f"  New (ingested): {total_stats['new']}")
-        logger.info(f"  Skipped (dupe): {total_stats['skipped']}")
-        logger.info(f"  Children embedded: {total_stats['children']}")
+        logger.info(f"  New files     : {results['new']}")
+        logger.info(f"  Updated files : {results['updated']}")
+        logger.info(f"  Skipped files : {results['skipped']}")
 
     except Exception as e:
         logger.error(f"Ingestion failed: {e}")
@@ -318,33 +304,10 @@ def ingest_all(data_dir: str = "data", batch_size: int = 20) -> None:
         qdrant_client.close()
 
 
-# ── Legacy single-file entry point (keeps backward compat) ──────────────────
-def ingest(source_path: str = "data/nadra.txt", batch_size: int = 20) -> None:
-    """Single-file ingest — wraps ingest_all for backward compatibility"""
-    pg_pool = _get_pg_pool()
-    pg_conn = pg_pool.getconn()
-    _init_tables(pg_conn)
-    qdrant_client = _make_qdrant_client()
-    _ensure_collection(qdrant_client)
-    try:
-        ingest_file(source_path, pg_conn, qdrant_client, batch_size)
-    except Exception as e:
-        pg_conn.rollback()
-        raise
-    finally:
-        pg_pool.putconn(pg_conn)
-        qdrant_client.close()
-
-
 def _upsert_with_retry(client: QdrantClient, points: List[PointStruct], max_retries=3):
-    """Retry upsert with exponential backoff for cloud timeouts"""
     for attempt in range(max_retries):
         try:
-            client.upsert(
-                collection_name=QDRANT_COLLECTION,
-                points=points,
-                wait=True
-            )
+            client.upsert(collection_name=QDRANT_COLLECTION, points=points, wait=True)
             return
         except Exception as e:
             if attempt == max_retries - 1:
@@ -355,10 +318,6 @@ def _upsert_with_retry(client: QdrantClient, points: List[PointStruct], max_retr
 
 
 class ParentChildRetriever:
-    """
-    Retrieves from Qdrant Cloud + Supabase PostgreSQL.
-    """
-
     def __init__(self, k: int = RETRIEVER_K) -> None:
         self.k = k
         self._qdrant = None
@@ -438,12 +397,10 @@ class ParentChildRetriever:
             self._qdrant.close()
 
 
-# LAZY INITIALIZATION
 retriever = None
 
 
 def get_retriever():
-    """Get or create retriever singleton"""
     global retriever
     if retriever is None:
         retriever = ParentChildRetriever(k=RETRIEVER_K)
