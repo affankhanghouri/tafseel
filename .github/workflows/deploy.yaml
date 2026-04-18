@@ -22,8 +22,10 @@ jobs:
           script: |
             cd ~/tafseel
 
-            # Pull latest code
-            git pull origin main
+            # Force pull latest code
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
 
             # Activate virtualenv
             source venv/bin/activate
@@ -31,10 +33,10 @@ jobs:
             # Install any new dependencies
             pip install -r requirements.txt --quiet
 
-            # Run ingestion (skips already-ingested chunks automatically)
+            # Run ingestion
             python ingest_all.py
 
-            # Restart FastAPI to pick up any code changes
+            # Restart FastAPI
             sudo systemctl restart fastapi.service
 
             echo "Deploy complete"
