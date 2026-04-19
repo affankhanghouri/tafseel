@@ -41,7 +41,7 @@ app.add_middleware(
 openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 UPLIFTAI_API_KEY = os.getenv("UPLIFTAI_API_KEY")
 UPLIFTAI_TTS_URL = "https://api.upliftai.org/v1/synthesis/text-to-speech"
-UPLIFTAI_VOICE_ID = "v_8eelc901"  # Free-tier safe Urdu voice
+UPLIFTAI_VOICE_ID = os.getenv("UPLIFTAI_VOICE_ID", "v_8eelc901")  # Urdu Info/Education
 
 # ── Startup key check ─────────────────────────────────────────────────────────
 if not UPLIFTAI_API_KEY:
@@ -51,10 +51,20 @@ else:
 
 
 # ── Shared LangGraph runner ───────────────────────────────────────────────────
-def _run_graph(question: str) -> dict:
+def _run_graph(question: str, urdu_mode: bool = False) -> dict:
     """Run LangGraph pipeline synchronously (called in thread pool)"""
+    # For voice: inject Urdu instruction into question so LLM answers in Urdu
+    if urdu_mode:
+        augmented_question = (
+            f"{question}\n\n"
+            "[IMPORTANT: Answer MUST be in Urdu script (اردو). "
+            "Do NOT use English. Write naturally in Urdu as if speaking to a Pakistani citizen.]"
+        )
+    else:
+        augmented_question = question
+
     return nia_graph.invoke({
-        "question":        question,
+        "question":        augmented_question,
         "need_retrieval":  False,
         "docs":            [],
         "relevant_docs":   [],
@@ -127,7 +137,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
       {"type": "status",     "text": "Searching NADRA knowledge base..."}  ← only if retrieval
       {"type": "status",     "text": "Preparing answer..."}
       {"type": "transcript", "text": "<transcribed question>"}
-      {"type": "answer",     "text": "<answer text>"}
+      {"type": "answer",     "text": "<answer text in Urdu>"}
       {"type": "audio",      "data": "<base64 encoded mp3>"}
       {"type": "done"}
     """
@@ -163,34 +173,46 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
         yield f"data: {json.dumps({'type': 'error', 'text': f'Transcription failed: {str(e)}'})}\n\n"
         return
 
-    # ── Step 2: LangGraph pipeline ────────────────────────────────────────────
+    # ── Step 2: LangGraph pipeline (urdu_mode=True forces Urdu answers) ───────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking...'})}\n\n"
     await asyncio.sleep(0)
 
     try:
-        result = await loop.run_in_executor(None, lambda: _run_graph(question))
+        result = await loop.run_in_executor(None, lambda: _run_graph(question, urdu_mode=True))
     except Exception as e:
         print(f"[Graph Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Pipeline failed: {str(e)}'})}\n\n"
         return
 
+    # ── Tell Flutter if retrieval happened so it can show a searching state ───
     needs_retrieval = result.get("need_retrieval", False)
     if needs_retrieval:
         yield f"data: {json.dumps({'type': 'status', 'text': 'Searching NADRA knowledge base...'})}\n\n"
-        await asyncio.sleep(0)
+        await asyncio.sleep(0.1)
 
     answer = result.get("answer", "No answer found.")
-    print(f"[Graph] Answer: {answer[:100]}...")
+    print(f"[Graph] Answer ({len(answer)} chars): {answer[:120]}...")
 
-    # ── Step 3: TTS — UpliftAI converts answer to Urdu audio ─────────────────
+    # ── Sanitise answer: strip the injected instruction if LLM echoed it ─────
+    # (some models repeat the system instruction in their output)
+    if "[IMPORTANT:" in answer:
+        answer = answer.split("[IMPORTANT:")[0].strip()
+
+    # ── Step 3: TTS — UpliftAI converts Urdu answer to audio ─────────────────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Preparing answer...'})}\n\n"
     await asyncio.sleep(0)
 
-    try:
-        print(f"[TTS] Calling UpliftAI | voice={UPLIFTAI_VOICE_ID} | text_len={len(answer)}")
-        print(f"[TTS] API Key present: {bool(UPLIFTAI_API_KEY)}")
+    # Truncate very long answers to stay within UpliftAI free-tier limits
+    # (~10 min of audio; ~3000 Urdu chars is roughly 5 min)
+    MAX_TTS_CHARS = 3000
+    tts_text = answer[:MAX_TTS_CHARS]
+    if len(answer) > MAX_TTS_CHARS:
+        print(f"[TTS] Answer truncated from {len(answer)} to {MAX_TTS_CHARS} chars for TTS")
 
-        async with httpx.AsyncClient(timeout=30) as client:
+    try:
+        print(f"[TTS] Calling UpliftAI | voice={UPLIFTAI_VOICE_ID} | text_len={len(tts_text)}")
+
+        async with httpx.AsyncClient(timeout=60) as client:
             tts_response = await client.post(
                 UPLIFTAI_TTS_URL,
                 headers={
@@ -199,35 +221,54 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
                 },
                 json={
                     "voiceId": UPLIFTAI_VOICE_ID,
-                    "text": answer,
+                    "text": tts_text,
                     "outputFormat": "MP3_22050_32",
                 },
             )
 
-        # ── Log full response before deciding what to do ──────────────────────
         print(f"[TTS] Response status: {tts_response.status_code}")
-        print(f"[TTS] Response headers: {dict(tts_response.headers)}")
+        print(f"[TTS] Content-Type: {tts_response.headers.get('content-type', 'unknown')}")
 
         if tts_response.status_code != 200:
             error_body = tts_response.text
             print(f"[TTS Error] Status {tts_response.status_code} | Body: {error_body}")
+            # Still send the answer text even if TTS fails
+            yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+            yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed [{tts_response.status_code}]: {error_body}'})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
             return
 
         audio_bytes_out = tts_response.content
         print(f"[TTS] Success — audio size: {len(audio_bytes_out)} bytes")
 
+        if len(audio_bytes_out) == 0:
+            print("[TTS Error] Empty audio response")
+            yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+            yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
+            yield f"data: {json.dumps({'type': 'error', 'text': 'TTS returned empty audio'})}\n\n"
+            yield f"data: {json.dumps({'type': 'done'})}\n\n"
+            return
+
     except httpx.TimeoutException:
-        print("[TTS Error] Request timed out after 30s")
+        print("[TTS Error] Request timed out after 60s")
+        yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+        yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error', 'text': 'TTS failed: request timed out'})}\n\n"
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
     except Exception as e:
         print(f"[TTS Error] {type(e).__name__}: {e}")
+        yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+        yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed: {str(e)}'})}\n\n"
+        yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
 
-    # ── Step 4: Send audio as base64 to Flutter ───────────────────────────────
+    # ── Step 4: Send transcript + answer + audio to Flutter ──────────────────
     audio_b64 = base64.b64encode(audio_bytes_out).decode("utf-8")
+    print(f"[TTS] Base64 length: {len(audio_b64)} chars — sending to Flutter")
+
     yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
     yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
     yield f"data: {json.dumps({'type': 'audio',      'data': audio_b64})}\n\n"
@@ -239,10 +280,6 @@ async def voice(file: UploadFile = File(...)):
     """
     Accepts an audio file from Flutter.
     Returns SSE stream with status updates and final base64 audio.
-
-    Flutter sends:
-      MultipartRequest with field name 'file'
-      Supported formats: m4a, mp3, wav, webm, ogg
     """
     audio_bytes = await file.read()
     print(f"[Voice] Received file: {file.filename} | size: {len(audio_bytes)} bytes")
@@ -252,6 +289,8 @@ async def voice(file: UploadFile = File(...)):
         headers={
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
+            # Disable any proxy buffering — critical for large SSE events
+            "Transfer-Encoding": "chunked",
         },
     )
 
