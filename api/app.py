@@ -41,7 +41,13 @@ app.add_middleware(
 openai_client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 UPLIFTAI_API_KEY = os.getenv("UPLIFTAI_API_KEY")
 UPLIFTAI_TTS_URL = "https://api.upliftai.org/v1/synthesis/text-to-speech"
-UPLIFTAI_VOICE_ID = "v_meklc281"  # Natural Pakistani Urdu voice
+UPLIFTAI_VOICE_ID = "v_8eelc901"  # Free-tier safe Urdu voice
+
+# ── Startup key check ─────────────────────────────────────────────────────────
+if not UPLIFTAI_API_KEY:
+    print("⚠️  WARNING: UPLIFTAI_API_KEY is not set in .env — /voice endpoint will fail")
+else:
+    print(f"✅ UPLIFTAI_API_KEY loaded: {UPLIFTAI_API_KEY[:8]}...")
 
 
 # ── Shared LangGraph runner ───────────────────────────────────────────────────
@@ -63,7 +69,7 @@ def _run_graph(question: str) -> dict:
     })
 
 
-# ── /chat endpoint (existing - unchanged) ────────────────────────────────────
+# ── /chat endpoint ────────────────────────────────────────────────────────────
 class ChatRequest(BaseModel):
     question: str
 
@@ -112,15 +118,17 @@ async def chat(request: ChatRequest):
     )
 
 
-# ── /voice endpoint (new) ─────────────────────────────────────────────────────
+# ── /voice endpoint ───────────────────────────────────────────────────────────
 async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerator[str, None]:
     """
     Streams status events then final audio:
-      {"type": "status", "text": "Listening..."}
-      {"type": "status", "text": "Thinking..."}
-      {"type": "status", "text": "Searching NADRA knowledge base..."}  ← only if retrieval
-      {"type": "status", "text": "Preparing answer..."}
-      {"type": "audio",  "data": "<base64 encoded mp3>"}
+      {"type": "status",     "text": "Listening..."}
+      {"type": "status",     "text": "Thinking..."}
+      {"type": "status",     "text": "Searching NADRA knowledge base..."}  ← only if retrieval
+      {"type": "status",     "text": "Preparing answer..."}
+      {"type": "transcript", "text": "<transcribed question>"}
+      {"type": "answer",     "text": "<answer text>"}
+      {"type": "audio",      "data": "<base64 encoded mp3>"}
       {"type": "done"}
     """
     loop = asyncio.get_event_loop()
@@ -130,7 +138,6 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
     await asyncio.sleep(0)
 
     try:
-        # Save audio bytes to a temp file for Whisper
         suffix = "." + filename.split(".")[-1] if "." in filename else ".m4a"
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(audio_bytes)
@@ -149,7 +156,10 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
             yield f"data: {json.dumps({'type': 'error', 'text': 'Could not understand audio. Please try again.'})}\n\n"
             return
 
+        print(f"[STT] Transcribed: {question}")
+
     except Exception as e:
+        print(f"[STT Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Transcription failed: {str(e)}'})}\n\n"
         return
 
@@ -160,6 +170,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
     try:
         result = await loop.run_in_executor(None, lambda: _run_graph(question))
     except Exception as e:
+        print(f"[Graph Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Pipeline failed: {str(e)}'})}\n\n"
         return
 
@@ -169,12 +180,16 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
         await asyncio.sleep(0)
 
     answer = result.get("answer", "No answer found.")
+    print(f"[Graph] Answer: {answer[:100]}...")
 
     # ── Step 3: TTS — UpliftAI converts answer to Urdu audio ─────────────────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Preparing answer...'})}\n\n"
     await asyncio.sleep(0)
 
     try:
+        print(f"[TTS] Calling UpliftAI | voice={UPLIFTAI_VOICE_ID} | text_len={len(answer)}")
+        print(f"[TTS] API Key present: {bool(UPLIFTAI_API_KEY)}")
+
         async with httpx.AsyncClient(timeout=30) as client:
             tts_response = await client.post(
                 UPLIFTAI_TTS_URL,
@@ -188,18 +203,34 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
                     "outputFormat": "MP3_22050_32",
                 },
             )
-            tts_response.raise_for_status()
-            audio_bytes_out = tts_response.content
 
+        # ── Log full response before deciding what to do ──────────────────────
+        print(f"[TTS] Response status: {tts_response.status_code}")
+        print(f"[TTS] Response headers: {dict(tts_response.headers)}")
+
+        if tts_response.status_code != 200:
+            error_body = tts_response.text
+            print(f"[TTS Error] Status {tts_response.status_code} | Body: {error_body}")
+            yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed [{tts_response.status_code}]: {error_body}'})}\n\n"
+            return
+
+        audio_bytes_out = tts_response.content
+        print(f"[TTS] Success — audio size: {len(audio_bytes_out)} bytes")
+
+    except httpx.TimeoutException:
+        print("[TTS Error] Request timed out after 30s")
+        yield f"data: {json.dumps({'type': 'error', 'text': 'TTS failed: request timed out'})}\n\n"
+        return
     except Exception as e:
+        print(f"[TTS Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed: {str(e)}'})}\n\n"
         return
 
     # ── Step 4: Send audio as base64 to Flutter ───────────────────────────────
     audio_b64 = base64.b64encode(audio_bytes_out).decode("utf-8")
     yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
-    yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
-    yield f"data: {json.dumps({'type': 'audio', 'data': audio_b64})}\n\n"
+    yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
+    yield f"data: {json.dumps({'type': 'audio',      'data': audio_b64})}\n\n"
     yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
 
@@ -208,12 +239,13 @@ async def voice(file: UploadFile = File(...)):
     """
     Accepts an audio file from Flutter.
     Returns SSE stream with status updates and final base64 audio.
-    
+
     Flutter sends:
       MultipartRequest with field name 'file'
       Supported formats: m4a, mp3, wav, webm, ogg
     """
     audio_bytes = await file.read()
+    print(f"[Voice] Received file: {file.filename} | size: {len(audio_bytes)} bytes")
     return StreamingResponse(
         run_voice_pipeline(audio_bytes, file.filename or "audio.m4a"),
         media_type="text/event-stream",
