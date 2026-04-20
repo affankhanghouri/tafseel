@@ -6,8 +6,10 @@ from src.state import MyState
 from src.prompts import (
     decide_retrieval_prompt,
     direct_generation_prompt,
+    direct_generation_voice_prompt,
     is_relevant_prompt,
     rag_generation_prompt,
+    rag_generation_voice_prompt,
     issup_prompt,
     revise_prompt,
     isuse_prompt,
@@ -31,9 +33,12 @@ def decide_retrieval(state: MyState):
 # Generation node: direct LLM answer (no retrieval path)
 # ─────────────────────────────────────────────
 def generate_direct(state: MyState):
-    ans = llm.invoke(
-        direct_generation_prompt.format_messages(question=state["question"])
+    prompt = (
+        direct_generation_voice_prompt
+        if state.get("mode") == "voice"
+        else direct_generation_prompt
     )
+    ans = llm.invoke(prompt.format_messages(question=state["question"]))
     return {"answer": ans.content}
 
 
@@ -44,7 +49,7 @@ def generate_direct(state: MyState):
 # ─────────────────────────────────────────────
 def retrieve(state: MyState):
     query = state.get("retrieval_query") or state["question"]
-    retrieved_docs = get_retriever().invoke(query) 
+    retrieved_docs = get_retriever().invoke(query)
     return {"docs": retrieved_docs}
 
 
@@ -76,8 +81,14 @@ def generate_from_context(state: MyState):
     if not context:
         return {"answer": "No answer found.", "context": ""}
 
+    prompt = (
+        rag_generation_voice_prompt
+        if state.get("mode") == "voice"
+        else rag_generation_prompt
+    )
+
     out = llm.invoke(
-        rag_generation_prompt.format_messages(
+        prompt.format_messages(
             question=state["question"],
             context=context,
         )

@@ -51,20 +51,11 @@ else:
 
 
 # ── Shared LangGraph runner ───────────────────────────────────────────────────
-def _run_graph(question: str, urdu_mode: bool = False) -> dict:
+def _run_graph(question: str, mode: str = "text") -> dict:
     """Run LangGraph pipeline synchronously (called in thread pool)"""
-    # For voice: inject Urdu instruction into question so LLM answers in Urdu
-    if urdu_mode:
-        augmented_question = (
-            f"{question}\n\n"
-            "[IMPORTANT: Answer MUST be in Urdu script (اردو). "
-            "Do NOT use English. Write naturally in Urdu as if speaking to a Pakistani citizen.]"
-        )
-    else:
-        augmented_question = question
-
     return nia_graph.invoke({
-        "question":        augmented_question,
+        "question":        question,
+        "mode":            mode,
         "need_retrieval":  False,
         "docs":            [],
         "relevant_docs":   [],
@@ -96,7 +87,7 @@ async def run_graph_and_stream(question: str) -> AsyncGenerator[str, None]:
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking…'})}\n\n"
     await asyncio.sleep(0)
 
-    result = await loop.run_in_executor(None, lambda: _run_graph(question))
+    result = await loop.run_in_executor(None, lambda: _run_graph(question, mode="text"))
     needs_retrieval = result.get("need_retrieval", False)
 
     if needs_retrieval:
@@ -173,12 +164,12 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
         yield f"data: {json.dumps({'type': 'error', 'text': f'Transcription failed: {str(e)}'})}\n\n"
         return
 
-    # ── Step 2: LangGraph pipeline (urdu_mode=True forces Urdu answers) ───────
+    # ── Step 2: LangGraph pipeline (mode="voice" produces natural Urdu speech) ─
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking...'})}\n\n"
     await asyncio.sleep(0)
 
     try:
-        result = await loop.run_in_executor(None, lambda: _run_graph(question, urdu_mode=True))
+        result = await loop.run_in_executor(None, lambda: _run_graph(question, mode="voice"))
     except Exception as e:
         print(f"[Graph Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Pipeline failed: {str(e)}'})}\n\n"
@@ -192,11 +183,6 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
 
     answer = result.get("answer", "No answer found.")
     print(f"[Graph] Answer ({len(answer)} chars): {answer[:120]}...")
-
-    # ── Sanitise answer: strip the injected instruction if LLM echoed it ─────
-    # (some models repeat the system instruction in their output)
-    if "[IMPORTANT:" in answer:
-        answer = answer.split("[IMPORTANT:")[0].strip()
 
     # ── Step 3: TTS — UpliftAI converts Urdu answer to audio ─────────────────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Preparing answer...'})}\n\n"
@@ -232,7 +218,6 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
         if tts_response.status_code != 200:
             error_body = tts_response.text
             print(f"[TTS Error] Status {tts_response.status_code} | Body: {error_body}")
-            # Still send the answer text even if TTS fails
             yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed [{tts_response.status_code}]: {error_body}'})}\n\n"
@@ -289,7 +274,6 @@ async def voice(file: UploadFile = File(...)):
         headers={
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
-            # Disable any proxy buffering — critical for large SSE events
             "Transfer-Encoding": "chunked",
         },
     )

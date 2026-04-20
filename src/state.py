@@ -6,6 +6,7 @@ from langchain_core.documents import Document
 class MyState(TypedDict):
     # Core input
     question: str
+    mode: str                  # "text" or "voice"
 
     # Routing
     need_retrieval: bool
