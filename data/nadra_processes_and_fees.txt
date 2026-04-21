@@ -1,0 +1,676 @@
+================================================================================
+NADRA PROCESSES AND FEES KNOWLEDGE BASE
+Source: Official NADRA Data, DGIP, and Verified Sources | RAG-Optimized
+Last Updated: 2025-2026
+================================================================================
+
+NOTE TO RAG SYSTEM: This file contains detailed step-by-step processes and
+fee structures for ALL NADRA services. Use this file when a user asks about:
+- How to apply for any NADRA document
+- How much something costs
+- How long something takes
+- What documents are required
+- Renewal, modification, reprint, cancellation procedures
+
+================================================================================
+[SECTION: SERVICE TIERS OVERVIEW]
+================================================================================
+
+NADRA offers THREE processing tiers for all identity documents:
+
+TIER 1 - NORMAL  : Most affordable. Longest processing time. Best for non-urgent needs.
+TIER 2 - URGENT  : Moderate fee. Faster processing. Best for upcoming travel/deadlines.
+TIER 3 - EXECUTIVE: Highest fee. Fastest processing. Best for emergencies.
+
+IMPORTANT: All processing timelines begin AFTER fee submission and application approval.
+Delivery charges are NOT included in any of the fees listed below.
+Domestic delivery fee: Rs. 165 (within Pakistan)
+International delivery: Varies by country
+
+================================================================================
+[SECTION: CNIC — COMPUTERIZED NATIONAL IDENTITY CARD]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — ELIGIBILITY]
+--------------------------------------------------------------------------------
+ELIGIBILITY: All Pakistani citizens aged 18 years and above.
+LEGAL REQUIREMENT: Must apply within ONE MONTH of turning 18.
+LEGAL OFFENCE: Not applying within 90 days of turning 18 is an offence under NADRA Ordinance 2000, Section 30(1)(e).
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — FEE STRUCTURE]
+--------------------------------------------------------------------------------
+
+STANDARD CNIC (Non-Smart):
+CATEGORY     | FEE      | PROCESSING TIME
+New (Fresh)  | Rs. 0    | 15 working days (Normal)
+Modification | Rs. 400  | 15 days Normal / 12 days Urgent / 6 days Executive
+Duplicate    | Rs. 400  | 15 days Normal / 12 days Urgent / 6 days Executive
+Renewal      | Rs. 400  | 15 days Normal / 12 days Urgent / 6 days Executive
+Urgent fee for all categories above: Rs. 1,150
+Executive fee for all categories above: Rs. 2,150
+
+SMART CNIC / SNIC (Chip-based):
+CATEGORY     | NORMAL (31 days) | URGENT (23 days) | EXECUTIVE (9 days)
+New/Fresh    | Rs. 750          | Rs. 1,500        | Rs. 2,500
+Modification | Rs. 750          | Rs. 1,500        | Rs. 2,500
+Duplicate    | Rs. 750          | Rs. 1,500        | Rs. 2,500
+Renewal      | Rs. 750          | Rs. 1,500        | Rs. 2,500
+
+VALIDITY: 10 years for adults. Cards for minors have shorter validity.
+LOST/STOLEN CNIC: No additional documents required; card re-issued with existing data.
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — HOW TO APPLY AT NRC (NADRA REGISTRATION CENTER)]
+--------------------------------------------------------------------------------
+STEP 1 : Visit nearest NRC and obtain a Qmatic token.
+STEP 2 : Photograph will be captured.
+STEP 3 : Fingerprints and signature taken.
+STEP 4 : Data entry completed; digital form displayed for review.
+STEP 5 : Biometric verification by a blood relative (Father/Mother/Brother/Sister/Son/Daughter).
+         OR attestation by a Gazetted Officer (Grade 16+) if no relative available.
+STEP 6 : Interview and approval by Officer-in-Charge (OIC).
+STEP 7 : Fee submission.
+STEP 8 : CNIC printed and handed over upon completion of processing period.
+
+REQUIRED DOCUMENTS FOR FRESH CNIC:
+- Birth Certificate (Computerized, issued by UC/Municipal Committee/Cantonment)
+  OR Matric/Secondary School Certificate
+- CNIC copy of a parent or sibling (for biometric verification)
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — HOW TO APPLY VIA PAK ID MOBILE APP]
+--------------------------------------------------------------------------------
+APP NAVIGATION: Pak ID App > ID Documents > ID Card > Myself / My Blood Relative > Conversion/Renewal/Modification
+
+NOTE: Fresh/New CNIC CANNOT be applied through the Pak ID App or website.
+      New applicants must visit a NADRA Registration Center (NRC) in person.
+
+ONLINE AVAILABLE CATEGORIES: Renewal, Modification, Reprint/Duplicate only.
+
+STEP 1 : Log in or create account on Pak ID app (Android/iOS).
+STEP 2 : Select ID Card and choose category (Renewal/Modification/Duplicate).
+STEP 3 : Capture photograph and fingerprints through the app.
+STEP 4 : Enter required data; upload supporting documents if needed.
+STEP 5 : Biometric verification by a blood relative through app OR attestation by Gazetted Officer.
+STEP 6 : Review and submit application.
+STEP 7 : Pay fee (Debit/Credit Card, Raast, Easypaisa, JazzCash, e-Sahulat).
+STEP 8 : CNIC will be delivered to your doorstep.
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — MODIFICATION FIELDS]
+--------------------------------------------------------------------------------
+PRINTABLE FIELDS (require documents): Name, Father/Mother Name, Date of Birth,
+Address, Photograph, Signature, Marital Status.
+
+NON-PRINTABLE FIELDS (nominal fee Rs. 100 via NRC / $5 via App): Marital Status,
+Qualification, Profession, Contact Details.
+
+--------------------------------------------------------------------------------
+[TOPIC: CNIC — EXPEDITING AN EXISTING APPLICATION]
+--------------------------------------------------------------------------------
+You can upgrade Normal/Urgent to Executive by paying the fee difference:
+STEP 1 : Log in to Pak Identity Mobile App.
+STEP 2 : Go to NADRA Miscellaneous Services > Application Priority.
+STEP 3 : Enter Tracking ID and PIN Code. Press Next.
+STEP 4 : Pay the fee difference.
+STEP 5 : Receive acknowledgment from NADRA.
+
+================================================================================
+[SECTION: NICOP — NATIONAL IDENTITY CARD FOR OVERSEAS PAKISTANIS]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: NICOP — ELIGIBILITY]
+--------------------------------------------------------------------------------
+Eligible individuals:
+- Pakistani citizens residing abroad who hold nationality of a dual-nationality country
+- Citizens who are emigrants or intending emigrants (with foreign employment agreement)
+- Citizens holding foreign residence visa/permit
+- Dependents of emigrants
+
+DUAL NATIONALITY COUNTRIES: Australia, Belgium, Canada, Egypt, France, Iceland,
+Ireland, Italy, Jordan, Netherlands (Holland), New Zealand, Sweden, Switzerland,
+Syria, UK, USA, Bahrain, Finland, Denmark, Germany, Norway, Luxembourg.
+
+BENEFIT: NICOP holders can enter Pakistan without a visa on a foreign passport.
+
+--------------------------------------------------------------------------------
+[TOPIC: NICOP — FEE STRUCTURE]
+--------------------------------------------------------------------------------
+
+APPLYING FROM WITHIN PAKISTAN (fees in PKR):
+CATEGORY   | NORMAL (31 days) | URGENT (23 days) | EXECUTIVE (9 days)
+New/Renewal| Rs. 5,500        | Rs. 8,300        | Rs. 11,000
+Modification| Rs. 5,500       | Rs. 8,300        | Rs. 11,000
+
+APPLYING FROM ABROAD — ZONE A (USA, Canada, Europe, Australia, etc.) — fees in USD:
+CATEGORY   | NORMAL (31 days) | URGENT (23 days) | EXECUTIVE (9 days)
+New/Renewal| $39              | $57              | $75
+Modification| $39             | $57              | $75
+Duplicate  | $39              | $57              | $75
+
+APPLYING FROM ABROAD — ZONE B (Middle East, Africa, other regions) — fees in USD:
+CATEGORY   | NORMAL (31 days) | URGENT (23 days) | EXECUTIVE (9 days)
+New/Renewal| $20              | $30              | $40
+Modification| $20             | $30              | $40
+Duplicate  | $20              | $30              | $40
+
+ARAB COUNTRIES (UAE-specific — fees in AED):
+NORMAL: AED 75 | URGENT: AED 110 | EXECUTIVE: AED 150
+
+NOTE: Fees in USD may also be paid in PKR using the official conversion rate on application date.
+Flat service charge: $5 (USD) for non-printable field updates via app.
+
+--------------------------------------------------------------------------------
+[TOPIC: NICOP — HOW TO APPLY AT NRC]
+--------------------------------------------------------------------------------
+STEP 1 : Visit nearest NRC. Obtain a Qmatic token.
+STEP 2 : Photograph captured.
+STEP 3 : Fingerprints and signature taken.
+STEP 4 : Data entry done; digital form displayed for review.
+STEP 5 : Biometric verification by blood relative (Father/Mother/Brother/Sister)
+         OR attestation form printed for Gazetted Officer attestation.
+STEP 6 : Interview and approval by OIC.
+STEP 7 : Fee submission.
+
+--------------------------------------------------------------------------------
+[TOPIC: NICOP — HOW TO APPLY VIA PAK ID APP]
+--------------------------------------------------------------------------------
+APP NAVIGATION: Pak ID App > ID Card > Myself / My Blood Relative > Conversion
+
+Delivered to your doorstep worldwide.
+
+SMART NICOP ELIGIBILITY DOCUMENTS — UNDER 18 YEARS:
+- Identity documents of parents
+- Foreign detailed Birth Certificate OR S-1 Form (for non-residents)
+  OR Computerized Birth Certificate of UC/Municipal Committee (for intending emigrants)
+- Pakistani/Foreign passport OR residence permit OR travel document
+  OR Undertaking "A" attested by Pakistani embassy/mission
+
+SMART NICOP ELIGIBILITY DOCUMENTS — 18 YEARS AND ABOVE:
+- Identity document of parents or sibling
+- Foreign detailed Birth Certificate OR manual Birth Certificate OR S-1 Form
+  OR Computerized Birth Certificate (verified)
+- Pakistani/Foreign passport OR residence permit OR travel document
+  OR Undertaking "A" attested by Pakistani embassy/mission
+
+ALREADY REGISTERED: If you already have a CRC, Juvenile Card, or CNIC — provide that number.
+
+--------------------------------------------------------------------------------
+[TOPIC: NICOP — IMPORTANT RULES]
+--------------------------------------------------------------------------------
+- Foreign address can only be added in ONE address field (Present OR Permanent). The other must be a Pakistan address.
+- Fingerprints/signatures NOT required for children under 15 years of age.
+- For Smart NICOP attestation: mandatory step even for applications made abroad.
+
+================================================================================
+[SECTION: POC — PAKISTAN ORIGIN CARD]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: POC — ELIGIBILITY]
+--------------------------------------------------------------------------------
+Issued to eligible FOREIGNERS of Pakistani origin:
+1. Person who was a Pakistani citizen at any point in life.
+2. Individual whose any parent or grandparent (alive or deceased) was a Pakistani citizen.
+3. Individual (or their parents/grandparents) born in territory now included in Pakistan.
+4. Individual who acquired foreign nationality before Pakistan Citizenship Act 1951.
+5. Spouse of a Pakistani citizen or person of Pakistani origin.
+6. Dependent child of a foreign spouse.
+
+ALSO ELIGIBLE:
+- Foreign national married to a Pakistani citizen whose parents are of Pakistani origin.
+- Foreign national whose parents/grandparents are/were Pakistani nationals.
+- Foreign national whose relatives (brother/sister/uncle/aunt) are/were Pakistani nationals.
+
+NOT ELIGIBLE (Foreign Spouse category): Citizens of India, Israel, Taiwan, or enemy countries.
+
+--------------------------------------------------------------------------------
+[TOPIC: POC — FEE STRUCTURE (in USD)]
+--------------------------------------------------------------------------------
+CATEGORY   | NORMAL (31 days) | URGENT (23 days) | EXECUTIVE (9 days)
+New        | $150             | $200             | $250
+Renewal    | $150             | $200             | $250
+Modification| $200            | $250             | $300
+Duplicate  | $200             | $250             | $300
+
+VALIDITY:
+- POC based on ex-Pakistani/Parents/FPO family: 7 years
+- POC based on Spouse: 5 years
+
+--------------------------------------------------------------------------------
+[TOPIC: POC — HOW TO APPLY]
+--------------------------------------------------------------------------------
+APPLICATION METHOD: Exclusively through Pak ID Mobile App. Delivered to doorstep.
+CATEGORIES: New / Modification / Renewal / Cancellation
+
+--------------------------------------------------------------------------------
+[TOPIC: POC — DATA MODIFICATION FIELDS AND REQUIRED DOCUMENTS]
+--------------------------------------------------------------------------------
+
+DATE OF BIRTH CHANGE:
+- Original POC
+- Valid foreign passport with new date of birth
+
+NAME CHANGE:
+- Original POC
+- Valid foreign passport with new name
+- Name change deed (translated to English)
+
+PERMANENT PAKISTANI ADDRESS:
+- Scanned copy of POC
+- NICOP/POC of blood relatives/spouse with same address OR
+- Property document OR Tenancy agreement OR Relative's affidavit
+
+MARITAL STATUS:
+- Original POC and valid foreign passport
+- Marriage: Nikahnama OR Marriage Certificate
+- Re-marriage after death of spouse: Death Certificate + Latest Marriage Certificate
+- Re-marriage after divorce: Divorce Certificate + Latest Marriage Certificate
+- Widowed: Death Certificate of spouse + Affidavit
+
+NOTE: Foreign spouse POC holders cannot modify from Married to Divorced.
+
+================================================================================
+[SECTION: CRC — CHILD REGISTRATION CERTIFICATE (B-FORM)]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: CRC — ELIGIBILITY]
+--------------------------------------------------------------------------------
+Every Pakistani child UNDER 18 years of age whose parent(s) hold a valid CNIC/NICOP.
+LEGAL REQUIREMENT: Parents must register child within ONE MONTH of birth.
+
+--------------------------------------------------------------------------------
+[TOPIC: CRC — FEE STRUCTURE]
+--------------------------------------------------------------------------------
+CATEGORY           | FEE      | PROCESSING TIME
+Normal             | Rs. 50   | 7 days
+Executive          | Rs. 500  | 1 day
+
+--------------------------------------------------------------------------------
+[TOPIC: CRC — REQUIRED DOCUMENTS]
+--------------------------------------------------------------------------------
+INLAND BIRTHS  : Computerized Birth Registration Certificate (from UC/Municipal Committee/Cantonment)
+ABROAD BIRTHS  : Detailed Birth Certificate OR S-1 Form
+PARENT REQUIREMENT: Parent(s) must have valid CNIC or NICOP
+
+PHOTOGRAPH AND FINGERPRINT REQUIREMENTS:
+- Children up to 3 years     : Present only if CRC is for passport issuance
+- Children aged 3 to 10 years: Photograph is MANDATORY
+- Children aged 10 to 18 years: Photograph AND Fingerprints are MANDATORY
+
+--------------------------------------------------------------------------------
+[TOPIC: CRC — HOW TO APPLY AT NRC]
+--------------------------------------------------------------------------------
+STEP 1 : Visit nearest NRC; obtain token.
+STEP 2 : Biometric verification of parent.
+STEP 3 : Photograph and/or fingerprints of child (where required).
+STEP 4 : Data entered and reviewed.
+STEP 5 : Attestation by Spouse / Guardian / Gazetted Officer.
+STEP 6 : Fee submission (Executive Rs. 500 - 1 day / Normal Rs. 50 - 7 days).
+STEP 7 : CRC printed and handed over upon completion.
+
+--------------------------------------------------------------------------------
+[TOPIC: CRC — HOW TO APPLY VIA PAK ID APP]
+--------------------------------------------------------------------------------
+APP NAVIGATION: Pak ID App > Family > CRC or B-Form > Myself / My Blood Relative
+
+STEP 1 : Log in or create Pak ID account.
+STEP 2 : Go to Family > CRC or B-Form.
+STEP 3 : Choose Myself or My Blood Relatives.
+STEP 4 : Select category (Executive Rs. 500 - 1 day / Normal Rs. 50 - 7 days).
+STEP 5 : Start Application; review prefilled information.
+STEP 6 : Verify parent's details.
+STEP 7 : Enter disability details if required.
+STEP 8 : Capture child's photograph and fingerprints (where required).
+STEP 9 : Verify fingerprints of one parent.
+STEP 10: Upload required documents.
+STEP 11: Review and submit application.
+STEP 12: Pay fee after approval.
+STEP 13: CRC delivered as PDF in Pak ID Vault (within 1 day for Executive / 7 days for Normal).
+
+================================================================================
+[SECTION: JUVENILE CARD]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: JUVENILE CARD — OVERVIEW]
+--------------------------------------------------------------------------------
+Issued to Pakistani children UNDER 18 as an official identity document (physical card, unlike B-Form which is a certificate).
+Can be applied at NRC or online via Pak ID App.
+
+--------------------------------------------------------------------------------
+[TOPIC: JUVENILE CARD — FEE STRUCTURE]
+--------------------------------------------------------------------------------
+CATEGORY                  | FEE           | PROCESSING TIME
+Executive (excluding delivery) | Rs. 2,500 | 9 days
+Urgent (excluding delivery)    | Rs. 1,500 | 23 days
+Normal (excluding delivery)    | Rs. 750   | 31 days
+
+--------------------------------------------------------------------------------
+[TOPIC: JUVENILE CARD — REQUIRED DOCUMENTS]
+--------------------------------------------------------------------------------
+- If child already holds CRC: NO additional documents required.
+- If no CRC:
+  INLAND BIRTHS  : Computerized Birth Registration Certificate (UC/Municipal/Cantonment)
+  ABROAD BIRTHS  : Detailed Birth Certificate OR S-1 Form
+- Parent must hold valid CNIC or NICOP.
+- Child MUST be physically present.
+- Biometric verification of ONE parent with valid CNIC is MANDATORY.
+
+SPECIAL CASE: If both parents are unavailable/deceased:
+- Guardian can process Juvenile Card by providing Guardianship Certificate from Guardian Court.
+
+--------------------------------------------------------------------------------
+[TOPIC: JUVENILE CARD — HOW TO APPLY AT NRC]
+--------------------------------------------------------------------------------
+STEP 1 : Visit nearest NRC; obtain token.
+STEP 2 : Biometric verification of parent or sibling.
+STEP 3 : Photographs and fingerprints of child (where required).
+STEP 4 : Data entered and reviewed.
+STEP 5 : Attestation by one of the parents.
+STEP 6 : Interview of parent by OIC.
+STEP 7 : Fee submission.
+STEP 8 : Juvenile Card printed and handed over after processing period.
+
+--------------------------------------------------------------------------------
+[TOPIC: JUVENILE CARD — HOW TO APPLY VIA PAK ID APP]
+--------------------------------------------------------------------------------
+APP NAVIGATION: Pak ID App > ID Documents > ID Card > My Blood Relatives
+
+STEP 1 : Log in or create Pak ID account.
+STEP 2 : Go to ID Documents > ID Card > My Blood Relatives.
+STEP 3 : Enter B-Form number (if available) and select New Smart ID.
+STEP 4 : Capture parent's biometrics (verified).
+STEP 5 : Review prefilled information; add missing info.
+STEP 6 : Enter child's details and parent's details.
+STEP 7 : Enter disability details if required.
+STEP 8 : Capture child's photo and fingerprints (where required).
+STEP 9 : Upload required documents.
+STEP 10: Review and submit application.
+STEP 11: Pay fee after approval (Executive Rs. 2,500 / Urgent Rs. 1,500 / Normal Rs. 750).
+STEP 12: Juvenile Card dispatched to doorstep after processing period.
+
+================================================================================
+[SECTION: FRC — FAMILY REGISTRATION CERTIFICATE]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: FRC — OVERVIEW]
+--------------------------------------------------------------------------------
+Official document reflecting the family composition data of a registered person.
+Used for: Embassy applications, visa processing, inheritance, legal/official purposes.
+VALIDITY: Valid as proof of family data on the date of issuance.
+
+--------------------------------------------------------------------------------
+[TOPIC: FRC — CATEGORIES AND FEES]
+--------------------------------------------------------------------------------
+CATEGORY    | DESCRIPTION                                      | FEE
+By Birth    | Includes details of parents and siblings         | Rs. 1,000
+By Marriage | Includes details of spouse and children          | Rs. 1,000
+By Adoption | Includes details of guardian and adopted family  | Rs. 1,000
+By All      | Includes both alpha and beta family members      | Rs. 2,000
+
+PROCESSING TIME: Issued in real-time at NRC. Via Pak ID App: PDF within 24 hours.
+
+REQUIRED: 13-digit ID number of applicant (CRC/CNIC/NICOP/POC).
+
+--------------------------------------------------------------------------------
+[TOPIC: FRC — HOW TO APPLY AT NRC]
+--------------------------------------------------------------------------------
+STEP 1 : Visit nearest NRC; obtain token.
+STEP 2 : Biometric verification.
+STEP 3 : Photographs of minors taken (if CRC issued without photo).
+STEP 4 : Data downloaded and reviewed.
+STEP 5 : Fee submission.
+STEP 6 : FRC printed and handed over in REAL TIME.
+
+--------------------------------------------------------------------------------
+[TOPIC: FRC — HOW TO APPLY VIA PAK ID APP]
+--------------------------------------------------------------------------------
+APP NAVIGATION: Pak ID App > Family > FRC
+
+STEP 1 : Log in or create Pak ID account.
+STEP 2 : Go to Family > FRC.
+STEP 3 : Family member details will appear.
+STEP 4 : Records in RED require correction before proceeding.
+STEP 5 : Select category: By Birth / By Marriage / By Adoption / By All.
+STEP 6 : Review and submit application.
+STEP 7 : Pay fee.
+STEP 8 : FRC downloaded as PDF in ID Vault within 24 hours.
+
+IMPORTANT NOTES:
+- If child under 18 has CRC without photo, child must be physically present at NRC.
+- Incomplete records will not appear in FRC; update first, then apply.
+- If deceased family member, their CNIC must be cancelled (with Death Certificate) before FRC processing.
+- Only English name spelling corrections allowed during FRC; name changes NOT allowed.
+
+================================================================================
+[SECTION: CANCELLATION CERTIFICATES]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: CANCELLATION — DUE TO DEATH]
+--------------------------------------------------------------------------------
+FEE: FREE (No charge)
+PROCESSING TIME: 24 hours
+
+REQUIRED DOCUMENT:
+- Computerized Death Certificate (verified) from UC/Municipal Committee/Cantonment
+  OR Foreign Death Certificate
+
+HOW TO APPLY AT NRC:
+1. Obtain token
+2. Biometric verification
+3. Review deceased information
+4. Submit application
+5. Receive Cancellation Certificate within 24 hours
+
+VIA PAK ID APP:
+APP NAVIGATION: Pak ID App > ID Documents > ID Cancellation
+Processing: 24 hours. Certificate appears digitally in Pak ID account.
+
+LEGAL NOTE: Family must apply for cancellation within 60 DAYS of death.
+
+--------------------------------------------------------------------------------
+[TOPIC: CANCELLATION — DUE TO SURRENDER OF PAKISTANI NATIONALITY]
+--------------------------------------------------------------------------------
+FEE: Included in processing (applies for individuals moving to single-nationality countries)
+PROCESSING TIME: 2 days
+
+REQUIRED DOCUMENTS:
+- Single National Country Passport AND Undertaking "D" on prescribed format
+  OR Renunciation Certificate
+  OR Dual National Country Passport AND Renunciation Certificate (verified)
+
+HOW TO APPLY:
+NRC: Token > Biometric > Document submission > Fee > Certificate in 2 days.
+PAK ID APP: Pak ID App > Surrender ID > Myself / My Blood Relatives
+
+--------------------------------------------------------------------------------
+[TOPIC: CANCELLATION — POC DUE TO DUAL NATIONALITY AGREEMENT OR RESUMPTION]
+--------------------------------------------------------------------------------
+For Ex-Pakistanis resuming Pakistani nationality or when dual nationality agreement enacted.
+
+REQUIRED DOCUMENTS:
+- Resumption letter / Citizenship certificate from IMPASS (verified)
+  OR Undertaking "I" from applicant (if Pakistani citizenship was not formally renounced)
+
+--------------------------------------------------------------------------------
+[TOPIC: CANCELLATION — POC DUE TO DIVORCE (FOREIGN SPOUSE)]
+--------------------------------------------------------------------------------
+FEE: $25 (Executive — 2 days)
+Pakistani spouse MUST apply for cancellation of ex-spouse's POC after divorce.
+REQUIRED: Divorce papers.
+
+--------------------------------------------------------------------------------
+[TOPIC: DUP CANCELLATION — DUPLICATE IDENTITY CARDS]
+--------------------------------------------------------------------------------
+DUP STATUS: Citizens with two or more identity cards/CRCs with different ID numbers.
+
+FEE: Rs. 1,000 (for same particulars) / Rs. 10,000 (for different particulars)
+PROCESSING TIME: Varies (NRC visit required)
+
+REQUIRED DOCUMENTS:
+- Computerized Birth Registration Certificate
+- If Birth Certificate unavailable: Other government/foreign documents with personal particulars
+
+HOW TO APPLY: Visit any NRC; submit notarized affidavit in prescribed format.
+OVERSEAS: Email documents to dup.op@nadra.gov.pk
+
+================================================================================
+[SECTION: SUCCESSION CERTIFICATE]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: SUCCESSION CERTIFICATE — OVERVIEW]
+--------------------------------------------------------------------------------
+INTRODUCED: January 2021
+DESCRIPTION: NADRA issues Succession Certificates and Letters of Administration without court visits.
+IMPACT: Reduced judiciary workload by 30%.
+OPERATIONAL AREAS: ICT, Punjab, Sindh, Khyber Pakhtunkhwa (KP). Expansion ongoing.
+AVAILABLE AT: District-level NADRA offices.
+
+--------------------------------------------------------------------------------
+[TOPIC: SUCCESSION CERTIFICATE — FEES]
+--------------------------------------------------------------------------------
+ASSET VALUE > Rs. 100,000 : Rs. 20,000 (Rs. 22,000 in Sindh)
+ASSET VALUE < Rs. 100,000 : Rs. 10,000
+
+PROCESS: 5-step simplified process at district NADRA offices. No court visit needed.
+
+================================================================================
+[SECTION: MACHINE READABLE PASSPORT (MRP) — OVERVIEW]
+================================================================================
+
+NOTE: Passports are issued by the Directorate General of Immigration & Passports (DGIP),
+NOT directly by NADRA. However, NADRA records (CNIC/NICOP/CRC) are mandatory for
+passport applications. Passport biometrics can now be verified via NADRA PAKID Mobile App.
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT — FEE STRUCTURE (INLAND, INCLUDING SERVICE CHARGES)]
+--------------------------------------------------------------------------------
+
+5-YEAR VALIDITY:
+PAGES   | NORMAL      | URGENT
+36 pages| Rs. 5,500   | Rs. 8,500
+72 pages| Rs. 9,200   | Rs. 14,500
+100 pages| Rs. 10,000 | Rs. 19,000
+
+10-YEAR VALIDITY (adults only; minors under 15 are NOT eligible for 10-year passport):
+PAGES   | NORMAL      | URGENT
+36 pages| Rs. 7,700   | Rs. 12,200
+72 pages| Rs. 13,400  | Rs. 21,200
+100 pages| Rs. 14,500 | Rs. 28,000
+
+PROCESSING TIMES:
+Normal: Up to 21 working days
+Urgent: ~5 working days
+Fast-Track (EPO): ~2 working days (available at Executive Passport Offices in Islamabad/Lahore/Karachi)
+
+LOST PASSPORT REPLACEMENT:
+First loss: Higher than standard renewal (approx. Rs. 9,000 for 36-page normal MRP)
+Second loss: Significantly higher
+Third loss or more: Highest fee (deterrent pricing)
+NOTE: Lost passport replacement requires a Police Loss Report mentioning previous passport number.
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT — REQUIRED DOCUMENTS (ADULTS, 18+)]
+--------------------------------------------------------------------------------
+- Original valid CNIC/NICOP with photocopy
+- Previous passport (original + photocopy) if applicable
+- Bank paid fee challan OR e-payment confirmation (PSID No.)
+- NOC from department (for government/semi-government employees)
+- Foreign passport + photocopy (for dual nationals only)
+- Police report + previous passport number (for lost passports)
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT — REQUIRED DOCUMENTS (MINORS, UNDER 18)]
+--------------------------------------------------------------------------------
+- Original CRC (updated with photo and fingerprints for children 10+) OR Juvenile Card
+- OR NICOP for overseas minors
+- CNICs/Passports of both parents
+- Birth Certificate (with both parents' names)
+- Minor must be accompanied by one or both parents
+- For divorced/separated parents: Court order confirming custody
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT — HOW TO APPLY ONLINE (RENEWAL ONLY)]
+--------------------------------------------------------------------------------
+ONLINE PORTAL: https://onlinemrp.dgip.gov.pk
+
+NOTE: Online service is for RENEWAL only (inland applicants).
+New, Modification, Lost, and Damaged passports require in-person visit.
+Overseas Pakistanis can apply online for Renewal, New (newborns up to 2 years), Reprint, Damaged, Lost, and Modification.
+
+STEPS:
+1. Register/login on online portal.
+2. Select Renewal category.
+3. Upload photograph and fingerprints (600 DPI, JPG, Grayscale).
+4. Upload supporting documents.
+5. Pay fee online (Visa/Mastercard, e-Sahulat, Easypaisa, JazzCash).
+6. Track application via SMS to 9988 (send 11-digit token number).
+7. Collect passport from preferred RPO/EPO (inland) OR home delivery (overseas).
+
+FINGERPRINT VERIFICATION: Can now be done via NADRA PAKID Mobile App (replaces manual form).
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT — IMPORTANT RULES]
+--------------------------------------------------------------------------------
+- Passport MUST be renewed if expiring within 6 months (mandatory for travel).
+- For data changes (name, DOB, etc.), first get CNIC/NICOP modified, THEN apply for passport.
+- Fees are NON-REFUNDABLE, even if application is rejected.
+- Fee is the same for renewal and new applications (standard rates apply).
+- Passport fee payment methods: Passport Fee Asaan App, bank PSID payment, e-Sahulat.
+- Children under 15 can only get 5-year validity passports.
+- Fast-Track service NOT available for e-Passport delivery.
+
+================================================================================
+[SECTION: DELIVERY CHARGES SUMMARY]
+================================================================================
+
+DOMESTIC DELIVERY (Pakistan): Rs. 165
+INTERNATIONAL DELIVERY: Varies by country
+CERTIFICATES (FRC, CRC, Cancellation): Delivered digitally to Pak ID Vault; no courier.
+
+================================================================================
+[SECTION: PAYMENT METHODS ACCEPTED BY NADRA]
+================================================================================
+
+AT NRC (NADRA REGISTRATION CENTER):
+- Cash
+
+VIA PAK ID MOBILE APP / WEBSITE:
+- Credit card (Visa / Mastercard)
+- Debit card (Visa / Mastercard)
+- Raast (QR-based payment; valid for 30 minutes per QR code)
+- Easypaisa (Smart NIC and FRC only)
+- JazzCash (Smart NIC and FRC only)
+- e-Sahulat franchise (Smart NIC and FRC only)
+
+RAAST PAYMENT STEPS:
+1. Go to Inbox > Pay Now next to Tracking ID.
+2. Click Generate Raast QR.
+3. Screenshot the QR code.
+4. Open banking app > Scan QR > Upload QR image.
+5. Verify payment details and Confirm.
+6. Return to PakID app and click Verify Payment.
+
+OVERSEAS PAYMENTS: Credit/Debit card (Visa/Mastercard). Cash on delivery NOT available.
+
+================================================================================
+[SECTION: APPLICATION TRACKING]
+================================================================================
+
+TRACKING METHODS:
+1. Via Pak ID Mobile App: Check status in your account.
+2. Via NADRA Website: Enter Tracking ID on tracking page.
+3. Via SMS: Send your 11-digit Token No. to 8400 (for applications inside Pakistan).
+4. Via Helpline: Call 1777 (mobile users in Pakistan) or +92 51 111 786 100 (international).
+
+================================================================================
+END OF NADRA PROCESSES AND FEES KNOWLEDGE BASE
+================================================================================

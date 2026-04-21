@@ -1,0 +1,414 @@
+================================================================================
+NADRA DOCUMENT REQUIREMENTS, MODIFICATION RULES & 2025-2026 UPDATES
+Source: Official NADRA, DGIP, Pakistani Missions Abroad | RAG-Optimized
+Last Updated: 2025-2026
+================================================================================
+
+NOTE TO RAG SYSTEM: Use this file when a user asks about:
+- What documents are needed for a specific modification
+- What documents are needed for a specific service
+- New NADRA rules and regulations (2025/2026)
+- Attestation and verification rules
+- Complaint handling
+- Application referral and rejection
+
+================================================================================
+[SECTION: CNIC MODIFICATION — REQUIRED DOCUMENTS BY TYPE]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: NAME CORRECTION (SPELLING ERROR)]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Any ONE of: Matric Certificate / Educational Certificate / Pakistani Passport
+
+--------------------------------------------------------------------------------
+[TOPIC: NAME CHANGE AFTER MARRIAGE (FEMALE)]
+--------------------------------------------------------------------------------
+NEW 2025 RULE: Married women now have the CHOICE to display either their father's name
+OR their husband's name on their CNIC.
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Nikahnama (Marriage Certificate)
+- Nikah registered with Union Council
+
+PROCESS: Visit NRC > Request Marital Status/Name update > Provide biometrics > Submit documents > Pay Rs. 100 (non-printable field update).
+
+--------------------------------------------------------------------------------
+[TOPIC: NAME CHANGE AFTER DIVORCE]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Divorce Certificate / Khula Certificate from court
+- Updated Family Registration Certificate (FRC)
+
+--------------------------------------------------------------------------------
+[TOPIC: DATE OF BIRTH (DOB) MODIFICATION]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED (any one of):
+- Valid Pakistani passport with correct DOB
+- Valid foreign passport with correct DOB
+- Biometric Residence Permit (BRP) — for UK applicants
+- Valid Visa / Resident Permit / Work Permit / PR Card
+- Matriculation Certificate issued by Pakistani BISE (Board of Intermediate and Secondary Education)
+- Service Book issued by Government of Pakistan
+- Court Order issued by Pakistani Court of Law
+
+--------------------------------------------------------------------------------
+[TOPIC: PARENTAGE / FATHER-MOTHER NAME MODIFICATION]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Court Order from a Pakistani Court of Law (mandatory)
+- Court order must be verified by NADRA or concerned Mission
+- In overseas cases, High Commission verifies court order before processing
+
+--------------------------------------------------------------------------------
+[TOPIC: MARITAL STATUS CHANGE (SINGLE TO MARRIED)]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Nikahnama / Marriage Certificate
+- Marriage must be registered at Union Council BEFORE applying
+FEE: Rs. 100 (non-printable field update; change reflects in NADRA database but not on printed card face)
+
+--------------------------------------------------------------------------------
+[TOPIC: MARITAL STATUS CHANGE (MARRIED TO DIVORCED)]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Divorce Certificate / Talaq Nama from court
+
+--------------------------------------------------------------------------------
+[TOPIC: MARITAL STATUS CHANGE (MARRIED TO WIDOWED)]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Original CNIC
+- Death Certificate of spouse
+
+--------------------------------------------------------------------------------
+[TOPIC: ADDRESS MODIFICATION]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED (any one of):
+- Property documents in applicant's name
+- Tenancy agreement + owner's affidavit
+- Utility bill (electricity/gas/water)
+- Blood relative's CNIC with same address
+
+--------------------------------------------------------------------------------
+[TOPIC: PHOTOGRAPH UPDATE]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Scanned/photo copy of existing CNIC
+- Photograph taken at NRC (live capture at NADRA center mandatory for photo update)
+
+NOTE: Renewal automatically updates the photograph on the card.
+
+--------------------------------------------------------------------------------
+[TOPIC: RELIGION UPDATE]
+--------------------------------------------------------------------------------
+DOCUMENTS REQUIRED:
+- Affidavit
+- Relevant religious certificate (if changing to a minority religion)
+NOTE: Religion is recorded in NADRA's system but NOT printed on the card face.
+
+================================================================================
+[SECTION: NICOP MODIFICATION — REQUIRED DOCUMENTS BY FIELD]
+================================================================================
+
+Fields that can be modified on Smart NICOP/NICOP:
+- Name
+- Father and Mother Name Correction
+- Marital Status
+- Address
+- Date of Birth
+- Place of Birth
+- Photograph
+- Signature
+- Country of Stay
+- Country of Birth
+- Mother Language
+- Addition of Relative
+- Qualification
+- Contact Detail
+
+MARITAL STATUS MODIFICATION:
+- Marriage: Nikahnama / Marriage Certificate
+- Divorce: Divorce Certificate
+- Widow: Death certificate of spouse + Affidavit
+
+DATE OF BIRTH:
+- Valid Pakistani/Foreign passport OR BRP OR valid visa OR Matric Certificate OR Court Order
+
+PARENTAGE NAME:
+- Court Order from Pakistani Court of Law (verified by Mission)
+
+IMPORTANT NOTE FOR OVERSEAS APPLICANTS:
+- Foreign address can only appear in ONE address field (Present OR Permanent).
+  The other field MUST be a Pakistan address.
+- Fingerprints/signatures NOT required for children under 15 years.
+- Attestation is MANDATORY for all Smart ID overseas applications.
+- If no blood relative available: two Pakistani citizen witnesses with valid CNIC/NICOP
+  (must not be parents, children, spouse, or siblings) required.
+
+================================================================================
+[SECTION: FRESH CNIC — WHO QUALIFIES WITHOUT BLOOD RELATIVES]
+================================================================================
+
+If a citizen does NOT have any blood relative with a CNIC/NICOP:
+- Fingerprints of any Pakistani citizen holding CNIC/NICOP can be taken as witness.
+- Case will be forwarded to Pakistan headquarters for further verification.
+- This applies in overseas applications too.
+
+Citizens without parents, siblings, or children (family-less cases):
+- Cannot apply online; must visit NRC in person.
+- NADRA requires additional legal verification.
+- Gazetted Officer attestation can substitute blood relative biometrics.
+
+================================================================================
+[SECTION: WHO CAN ATTEST / VERIFY THE SMART ID VERIFIER FORM]
+================================================================================
+
+METHOD 1 — BIOMETRIC VERIFICATION (via Pak ID Mobile App):
+- Father, Mother, Brother, Sister, Son (18+), Daughter (18+)
+- Paternal/Maternal Grandfather/Grandmother, Spouse
+NOTE: Verifier captures fingerprints + digital signature in the mobile app.
+
+METHOD 2 — ATTESTATION BY AUTHORIZED PERSONS:
+- Member of Senate, National/Provincial Assembly, Local Body, or Zakat Committee
+- Federal/Provincial Government Officers in Basic Pay Scale 16 and above
+- Commissioned Officers of armed forces and civil armed forces
+- Officers of local bodies (equivalent to BPS-16)
+- Officers of autonomous/semi-autonomous bodies
+- Officers of Levies in BPS-16 and above
+- Officers of Government Bank and Government Corporations
+- Headmen (Lambardar) for persons living in their village
+- Officers of NADRA in BPS/NPS/Contractual scale 16 and above
+- Head of family (Grade 16+) can attest family members (NOT their own form)
+- Political Agent (PA) or Assistant Political Agent (APA)
+
+================================================================================
+[SECTION: 2025-2026 MAJOR REGULATORY UPDATES]
+================================================================================
+
+--------------------------------------------------------------------------------
+[TOPIC: NEW CNIC AND B-FORM RULES (June 2025)]
+--------------------------------------------------------------------------------
+SOURCE: Federal Cabinet approved amendments to NADRA NIC Rules, June 2025.
+
+KEY CHANGES:
+1. BIRTH REGISTRATION MANDATORY: Computerized Birth Registration Certificate from Union
+   Council is now mandatory BEFORE issuance of CRC (B-Form). No birth registration = no B-Form.
+
+2. CHILDREN'S BIOMETRIC REQUIREMENTS UPDATED:
+   - Under 3 years: Exempt from biometrics and photographs (unless for passport).
+   - 3 to 10 years: Photograph mandatory + iris scan (where available).
+   - 10 to 18 years: Biometrics (fingerprints), photograph, AND iris scan are mandatory.
+   Each child gets an individual CRC with a specified validity period.
+
+3. B-FORM FOR PASSPORT: New (updated) B-Form is now a prerequisite for passport applications.
+   Old B-Forms remain valid, but updated one is required for passports.
+
+4. FRC LEGAL STATUS: Family Registration Certificate (FRC) has been granted legal status.
+   Applicants must sign a declaration confirming accuracy of family information.
+   FRC now includes full details of spouses in cases of multiple marriages.
+
+5. WOMEN'S CHOICE ON CNIC: Married women can now choose to display either their
+   FATHER'S name OR their HUSBAND'S name on their CNIC — at their preference.
+
+6. FAMILY TYPES FORMALLY DEFINED:
+   - Alpha: By birth (parents and siblings)
+   - Beta: By marriage (spouse and children)
+   - Gamma: By adoption (guardian and adopted family)
+
+7. VOLUNTARY CORRECTION FACILITY: Citizens with incorrect identity records can proactively
+   report to NADRA for legal protection and correction.
+
+8. BIOMETRICS OFFICIALLY DEFINED: Biometrics is now formally defined in regulations as
+   personal data derived from physical/physiological/behavioral characteristics (facial images,
+   fingerprints) used for unique identification. All institutions (State Bank, FBR, PTA) must align.
+
+9. CHIPLESS IDENTITY CARD INTRODUCED: Lower-cost identity card option:
+   - No physical chip
+   - Bilingual data (Urdu + English)
+   - QR code for instant digital verification
+   - Faster delivery, more affordable
+
+--------------------------------------------------------------------------------
+[TOPIC: NADRA PAK ID MOBILE APP TRANSITION (January 2025)]
+--------------------------------------------------------------------------------
+- NADRA has migrated its primary service platform FROM the Pak ID website TO the Pak ID Mobile App.
+- The Pak ID Mobile App (Android and iOS) is now the PRIMARY channel for all online services.
+- Fresh/New CNIC STILL requires in-person NRC visit; all other categories available via app.
+
+--------------------------------------------------------------------------------
+[TOPIC: PASSPORT BIOMETRICS VIA PAK ID APP (2025)]
+--------------------------------------------------------------------------------
+- DGIP (Directorate General of Immigration & Passports) now allows fingerprint verification
+  for online passport applications via the NADRA PAKID Mobile App.
+- This replaces the need for a manual fingerprints form at the fingerprint upload stage.
+
+--------------------------------------------------------------------------------
+[TOPIC: DIGITAL IDENTITY (DIGITAL ID) — LAUNCHED 2025]
+--------------------------------------------------------------------------------
+DESCRIPTION: NADRA now issues Digital Identity credentials through the PakID app.
+- Secure, verifiable digital credentials stored in Pak ID Vault.
+- Enables Single Sign-On (SSO) access to multiple government portals.
+- QR codes on all documents for offline verification.
+- Complies with GDPR, NIST 800-63, ISO/IEC 27001, OAuth 2.0, OpenID Connect (OIDC).
+
+ELIGIBILITY FOR DIGITAL ID:
+- Must be at least 18 years old
+- Must have a SIM registered on their CNIC
+- Must complete biometric verification (photo + fingerprints via Pak ID app)
+
+================================================================================
+[SECTION: POC — RESUMPTION PROCESS (FORM Y) — DETAILED STEPS]
+================================================================================
+
+For ex-Pakistanis who wish to resume Pakistani nationality:
+
+STEP 1: Applicant fills declaration in quadruplicate in Form Y at Pakistani Mission.
+         Encloses original Renunciation Certificate + copies of CNIC/NICOP/POC.
+STEP 2: Mission attests Form Y and attached documents, forwards to Dte Gen IMPASS.
+STEP 3: Dte Gen IMPASS registers declaration, forwards to Mission AND NADRA.
+STEP 4: Mission hands registration document to applicant.
+STEP 5: Applicant provides registration document to NADRA to:
+         - Surrender POC
+         - Obtain NICOP (resuming Pakistani citizenship)
+
+NOTE: Additional documents may be requested by the Case Officer to confirm Pakistani origin.
+
+================================================================================
+[SECTION: COMPLAINT MANAGEMENT — NCCMS]
+================================================================================
+
+NCCMS = NADRA Centralized Complaint Management System
+
+WHEN TO USE NCCMS:
+- Technical issues on Pak ID app or website
+- Application errors (e.g., "already applied for application which is still in progress")
+- Rejected application (if no email received from NADRA)
+- Card received with errors
+- Identity card not received after payment
+- Unable to upload documents
+- Citizen Number not verified
+
+HOW TO CONTACT:
+- Online portal: https://complaints.nadra.gov.pk/
+- Phone (mobile users): 1777
+- Phone (landline/international): +92 51 111 786 100
+- For DUP overseas: dup.op@nadra.gov.pk
+
+WHAT TO INCLUDE IN COMPLAINT:
+- Tracking ID
+- Citizen Number (13-digit ID number)
+- Relevant screenshots/documents
+- Bank name + card type (for payment issues)
+- Country of application (for overseas applicants)
+
+--------------------------------------------------------------------------------
+[TOPIC: APPLICATION REFERRAL TO NRC]
+--------------------------------------------------------------------------------
+Your online application may be referred to a NADRA center if:
+- You provided misleading information
+- Your family details are incomplete
+- Your record is not permanently cleared in NADRA database
+- A family member's record is marked for verification
+
+IMPORTANT: If referred to NRC, you can visit ANY NADRA center.
+You DO NOT need to pay the fee again.
+There is NO time limit for visiting NRC after referral.
+
+================================================================================
+[SECTION: PAK ID APP — COMMON ACCOUNT ISSUES AND SOLUTIONS]
+================================================================================
+
+ISSUE: "PakID account not verified, Citizen Number already associated with another account"
+SOLUTION: You can only create ONE PakID account per identity card number.
+Login to the existing account. Use "Forgot Password" to reset and login.
+
+ISSUE: "Email already registered with another account"
+SOLUTION: Each email address can only be used for one PakID account.
+Use a different email address for your new account.
+
+ISSUE: Fingerprint matching failure during account verification
+SOLUTION: Try facial verification option. If that also fails, apply through a blood relative's
+(father/mother/sibling/child 18+) PakID account. Or contact NCCMS to refresh fingerprint attempt count.
+
+ISSUE: "Citizen Number not verified" error
+SOLUTION: May indicate: DUP-marked record, cancelled record, or record marked for verification.
+Visit NADRA center in person for processing.
+
+ISSUE: "Error: You are not eligible to apply for Smart ID"
+SOLUTION: Either your ID card expired more than one year ago, OR your record is marked for verification.
+Visit any NADRA center.
+
+ISSUE: Not receiving OTP/PIN in email during account creation
+SOLUTION: Check Spam/Junk folder. The OTP is a 4-digit PIN.
+
+ISSUE: Location permission error on Pak ID app
+SOLUTION: Enable location services on mobile BEFORE opening the app.
+Allow location permission when prompted. Ensure stable internet connection.
+
+================================================================================
+[SECTION: IMPORTANT NADRA RULES AND POLICIES]
+================================================================================
+
+CNIC VALIDITY: 10 years for adults (18 and above).
+
+CNIC VALIDITY FOR MINORS: Issued for shorter durations; transitions to full CNIC at age 18.
+
+CNIC IS REQUIRED FOR:
+- Electoral processes (voting)
+- Banking and financial transactions
+- Issuance of passports
+- Government and private employment
+- Property transactions and inheritance
+- Mobile SIM card issuance
+- Government schemes, subsidies, welfare programs (BISP, Sehat Sahulat)
+- Security clearance and general identification
+
+LEGAL FACTS:
+- Not applying for CNIC within 90 days of turning 18 is a criminal offence (NADRA Ordinance 2000, Section 30).
+- Not registering a newborn child within 1 month of birth is also an offence.
+- Providing fake or forged information to NADRA may lead to legal proceedings (Section 30, NADRA Ordinance 2000).
+- Family members must cancel a deceased person's CNIC within 60 days of their death.
+
+CNIC NUMBER STRUCTURE:
+The 13-digit CNIC number is not random. Each digit group carries specific information about
+the card holder's province, district, and registration sequence.
+
+OVERSEAS APPLICANTS WITH CNIC/NICOP/POC: Must insert their existing ID number when applying
+for NICOP/POC. Applying in New/Fresh category when you already have an ID number will result
+in case closure; applicant must reapply and initiate a refund request.
+
+================================================================================
+[SECTION: CNIC INFORMATION PRINTED ON CARD]
+================================================================================
+
+FIELDS PRINTED ON THE CNIC FACE:
+- Legal Name (Urdu and English)
+- Gender (Male / Female / Transgender)
+- Father's Name (or Husband's Name for married females — now at woman's choice)
+- Date of Birth
+- National Identity Card Number (13 digits)
+- Family Tree ID Number
+- Current Address
+- Permanent Address
+- Date of Issue
+- Date of Expiry
+- Signature
+- Photograph
+- Fingerprint (Thumbprint)
+
+FIELDS IN NADRA DATABASE ONLY (not on card face):
+- Religion
+- Marital Status
+- Qualification
+- Profession
+- Contact Details
+
+================================================================================
+END OF NADRA DOCUMENT REQUIREMENTS, MODIFICATION RULES & UPDATES KNOWLEDGE BASE
+================================================================================
