@@ -5,10 +5,12 @@ warnings.filterwarnings("ignore")
 
 if __name__ == "__main__":
     question = input("Ask your question: ")
+    language = input("Language (urdu/sindhi/balochi/english) [urdu]: ").strip().lower() or "urdu"
 
     result = app.invoke({
         "question":         question,
         "mode":             "text",
+        "language":         language,
         "conversation_id":  None,
         "history":          [],
         "need_retrieval":   False,

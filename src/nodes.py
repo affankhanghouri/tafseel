@@ -9,14 +9,15 @@ from src.state import MyState
 from src.prompts import (
     decide_retrieval_prompt,
     direct_generation_prompt,
-    direct_generation_voice_prompt,
-    is_relevant_prompt,
     rag_generation_prompt,
-    rag_generation_voice_prompt,
+    is_relevant_prompt,
     issup_prompt,
     revise_prompt,
     isuse_prompt,
     rewrite_for_retrieval_prompt,
+    VOICE_DIRECT_PROMPTS,
+    VOICE_RAG_PROMPTS,
+    LANGUAGE_INSTRUCTIONS,
 )
 from src.routing import llm, voice_llm, decision_llm, relevance_llm, issup_llm, isuse_llm, rewrite_llm
 from src.ingestion import get_retriever
@@ -24,6 +25,18 @@ from src.ingestion import get_retriever
 logger = logging.getLogger(__name__)
 
 HISTORY_WINDOW = 5   # last 5 user+assistant turns passed to generation nodes
+
+# Supported languages — fallback to urdu if unknown
+SUPPORTED_LANGUAGES = {"urdu", "sindhi", "balochi", "english"}
+
+
+def _resolve_language(state: MyState) -> str:
+    """Return a validated, lowercase language string."""
+    lang = state.get("language", "urdu").lower().strip()
+    if lang not in SUPPORTED_LANGUAGES:
+        logger.warning(f"[language] Unknown language '{lang}' — defaulting to 'urdu'")
+        return "urdu"
+    return lang
 
 
 def _build_history_messages(state: MyState) -> list:
@@ -40,7 +53,7 @@ def _build_history_messages(state: MyState) -> list:
 
 
 # ─────────────────────────────────────────────
-# Router node
+# Router node — language-agnostic
 # ─────────────────────────────────────────────
 def decide_retrieval(state: MyState):
     try:
@@ -55,20 +68,36 @@ def decide_retrieval(state: MyState):
 
 # ─────────────────────────────────────────────
 # Direct generation (no retrieval)
+# Voice: language-specific voice prompt
+# Text: unified prompt with language instruction injected
 # ─────────────────────────────────────────────
 def generate_direct(state: MyState):
     is_voice = state.get("mode") == "voice"
-    prompt   = direct_generation_voice_prompt if is_voice else direct_generation_prompt
-    model    = voice_llm if is_voice else llm
+    language = _resolve_language(state)
     history_messages = _build_history_messages(state)
+
     try:
-        ans = model.invoke(
-            prompt.format_messages(question=state["question"], history=history_messages)
-        )
+        if is_voice:
+            prompt = VOICE_DIRECT_PROMPTS[language]
+            ans = voice_llm.invoke(
+                prompt.format_messages(
+                    question=state["question"],
+                    history=history_messages,
+                )
+            )
+        else:
+            lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["urdu"])
+            ans = llm.invoke(
+                direct_generation_prompt.format_messages(
+                    question=state["question"],
+                    history=history_messages,
+                    language_instruction=lang_instruction,
+                )
+            )
         return {"answer": ans.content}
     except Exception as e:
         logger.error(f"[generate_direct] LLM call failed: {e}")
-        return {"answer": "I'm sorry, I encountered an issue. Please try again or call NADRA at 1777."}
+        return {"answer": _fallback_message(language, is_voice)}
 
 
 # ─────────────────────────────────────────────
@@ -123,7 +152,7 @@ def is_relevant(state: MyState):
 
 
 # ─────────────────────────────────────────────
-# RAG generation
+# RAG generation — language-aware
 # ─────────────────────────────────────────────
 def generate_from_context(state: MyState):
     context = "\n\n---\n\n".join(
@@ -134,32 +163,45 @@ def generate_from_context(state: MyState):
         return {"answer": "No answer found.", "context": ""}
 
     is_voice = state.get("mode") == "voice"
-    prompt   = rag_generation_voice_prompt if is_voice else rag_generation_prompt
-    model    = voice_llm if is_voice else llm
+    language = _resolve_language(state)
     history_messages = _build_history_messages(state)
 
     try:
-        out = model.invoke(
-            prompt.format_messages(
-                question=state["question"],
-                context=context,
-                history=history_messages,
+        if is_voice:
+            prompt = VOICE_RAG_PROMPTS[language]
+            out = voice_llm.invoke(
+                prompt.format_messages(
+                    question=state["question"],
+                    context=context,
+                    history=history_messages,
+                )
             )
-        )
+        else:
+            lang_instruction = LANGUAGE_INSTRUCTIONS.get(language, LANGUAGE_INSTRUCTIONS["urdu"])
+            out = llm.invoke(
+                rag_generation_prompt.format_messages(
+                    question=state["question"],
+                    context=context,
+                    history=history_messages,
+                    language_instruction=lang_instruction,
+                )
+            )
         return {"answer": out.content, "context": context}
     except Exception as e:
         logger.error(f"[generate_from_context] LLM call failed: {e}")
         return {
-            "answer": "I'm sorry, I encountered an issue. Please try again or call NADRA at 1777.",
+            "answer": _fallback_message(language, is_voice),
             "context": context,
         }
 
 
 # ─────────────────────────────────────────────
-# Terminal: no relevant docs
+# Terminal: no relevant docs found
 # ─────────────────────────────────────────────
 def no_answer_found(state: MyState):
-    return {"answer": "No answer found.", "context": ""}
+    language = _resolve_language(state)
+    is_voice = state.get("mode") == "voice"
+    return {"answer": _no_answer_message(language, is_voice), "context": ""}
 
 
 # ─────────────────────────────────────────────
@@ -181,10 +223,11 @@ def is_sup(state: MyState):
 
 
 # ─────────────────────────────────────────────
-# Revise answer
+# Revise answer — preserves language automatically (prompt instructs the LLM)
 # ─────────────────────────────────────────────
 def revise_answer(state: MyState):
     is_voice = state.get("mode") == "voice"
+    language = _resolve_language(state)
     model = voice_llm if is_voice else llm
     try:
         out = model.invoke(
@@ -197,7 +240,10 @@ def revise_answer(state: MyState):
         return {"answer": out.content, "retries": state.get("retries", 0) + 1}
     except Exception as e:
         logger.error(f"[revise_answer] LLM call failed: {e} — keeping current answer")
-        return {"answer": state.get("answer", "No answer found."), "retries": state.get("retries", 0) + 1}
+        return {
+            "answer": state.get("answer", _fallback_message(language, is_voice)),
+            "retries": state.get("retries", 0) + 1,
+        }
 
 
 # ─────────────────────────────────────────────
@@ -219,6 +265,7 @@ def is_use(state: MyState):
 
 # ─────────────────────────────────────────────
 # Rewrite question for better retrieval
+# Always rewrites to English for consistent vector search
 # ─────────────────────────────────────────────
 def rewrite_question(state: MyState):
     try:
@@ -245,3 +292,28 @@ def rewrite_question(state: MyState):
             "relevant_docs": [],
             "context": "",
         }
+
+
+# ─────────────────────────────────────────────
+# Fallback messages — per language, per mode
+# ─────────────────────────────────────────────
+def _fallback_message(language: str, is_voice: bool) -> str:
+    """Generic error fallback in the correct language."""
+    messages = {
+        "urdu":    "معذرت، ایک مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں یا NADRA ہیلپ لائن 1 7 7 7 پر کال کریں۔",
+        "sindhi":  "معاف ڪجو، هڪ مسئلو پيش آيو۔ مهرباني ڪري ٻيهر ڪوشش ڪريو يا NADRA helpline 1 7 7 7 تي call ڪريو۔",
+        "balochi": "معاف کن، یک مشکل پیش آمد۔ دوباره امتحان بکن یا NADRA helpline 1 7 7 7 را زنگ بزن۔",
+        "english": "I'm sorry, I encountered an issue. Please try again or call the NADRA helpline at 1-7-7-7.",
+    }
+    return messages.get(language, messages["urdu"])
+
+
+def _no_answer_message(language: str, is_voice: bool) -> str:
+    """No-answer message in the correct language."""
+    messages = {
+        "urdu":    "معذرت، اس سوال کا جواب میسر نہیں ہے۔ مزید مدد کے لیے NADRA ہیلپ لائن 1 7 7 7 پر کال کریں یا complaints.nadra.gov.pk پر جائیں۔",
+        "sindhi":  "معاف ڪجو، هن سوال جو جواب موجود ناهي۔ وڌيڪ مدد لاءِ NADRA helpline 1 7 7 7 تي call ڪريو يا complaints.nadra.gov.pk تي وڃو۔",
+        "balochi": "معاف کن، این سوال جواب موجود نیست۔ بیشتر کمک لئی NADRA helpline 1 7 7 7 را زنگ بزن یا complaints.nadra.gov.pk را ببین۔",
+        "english": "I'm sorry, I couldn't find an answer to your question. For further help, please call the NADRA helpline at 1-7-7-7 or visit complaints.nadra.gov.pk.",
+    }
+    return messages.get(language, messages["urdu"])

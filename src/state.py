@@ -12,6 +12,7 @@ class MyState(TypedDict):
     # Core input
     question: str
     mode: str                  # "text" or "voice"
+    language: str              # "urdu" | "sindhi" | "balochi" | "english"
 
     # Conversation memory
     conversation_id: Optional[str]          # UUID of the current conversation

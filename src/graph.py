@@ -25,16 +25,16 @@ def build_graph() -> StateGraph:
     graph = StateGraph(MyState)
 
     # ── Nodes ──────────────────────────────────────────
-    graph.add_node("decide_retrieval",    decide_retrieval)
-    graph.add_node("generate_direct",     generate_direct)
-    graph.add_node("retrieve",            retrieve)
-    graph.add_node("is_relevant",         is_relevant)
+    graph.add_node("decide_retrieval",      decide_retrieval)
+    graph.add_node("generate_direct",       generate_direct)
+    graph.add_node("retrieve",              retrieve)
+    graph.add_node("is_relevant",           is_relevant)
     graph.add_node("generate_from_context", generate_from_context)
-    graph.add_node("no_answer_found",     no_answer_found)
-    graph.add_node("is_sup",              is_sup)
-    graph.add_node("revise_answer",       revise_answer)
-    graph.add_node("is_use",              is_use)
-    graph.add_node("rewrite_question",    rewrite_question)
+    graph.add_node("no_answer_found",       no_answer_found)
+    graph.add_node("is_sup",                is_sup)
+    graph.add_node("revise_answer",         revise_answer)
+    graph.add_node("is_use",                is_use)
+    graph.add_node("rewrite_question",      rewrite_question)
 
     # ── Edges ──────────────────────────────────────────
 
@@ -74,7 +74,7 @@ def build_graph() -> StateGraph:
         "is_sup",
         route_after_issup,
         {
-            "accept_answer": "is_use",       # "accept_answer" is a routing label, not a node
+            "accept_answer": "is_use",
             "revise_answer": "revise_answer",
         },
     )
