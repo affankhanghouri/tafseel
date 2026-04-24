@@ -1,7 +1,8 @@
 import os
 from typing import Literal
 
-from langchain_google_genai import ChatGoogleGenerativeAI
+# BUG FIX #1: was "langchain_graphraphroq" (typo) — correct package is "langchain_groq"
+from langchain_groq import ChatGroq
 
 from src.models import (
     RetrievalDecision,
@@ -16,7 +17,7 @@ from src.config import MAX_RETRIES, MAX_REWRITE_TRIES
 # ─────────────────────────────────────────────
 # LLM + structured output variants
 # ─────────────────────────────────────────────
-llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=os.getenv("GEMINI_API_KEY"))
+llm = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
 
 decision_llm  = llm.with_structured_output(RetrievalDecision)
 relevance_llm = llm.with_structured_output(RelevanceDecision)
