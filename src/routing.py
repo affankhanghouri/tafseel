@@ -1,8 +1,8 @@
 import os
 from typing import Literal
 
-# BUG FIX #1: was "langchain_graphraphroq" (typo) — correct package is "langchain_groq"
 from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
 
 from src.models import (
     RetrievalDecision,
@@ -17,7 +17,12 @@ from src.config import MAX_RETRIES, MAX_REWRITE_TRIES
 # ─────────────────────────────────────────────
 # LLM + structured output variants
 # ─────────────────────────────────────────────
+
+# Llama — used for all graders and routing (fast, cheap, JSON output)
 llm = ChatGroq(model="llama-3.3-70b-versatile", api_key=os.getenv("GROQ_API_KEY"))
+
+# GPT-4o — used ONLY for voice answer generation (best natural Urdu quality)
+voice_llm = ChatOpenAI(model="gpt-4o", api_key=os.getenv("OPENAI_API_KEY"))
 
 decision_llm  = llm.with_structured_output(RetrievalDecision)
 relevance_llm = llm.with_structured_output(RelevanceDecision)
