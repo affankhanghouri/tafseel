@@ -50,6 +50,43 @@ else:
     print(f"✅ UPLIFTAI_API_KEY loaded: {UPLIFTAI_API_KEY[:8]}...")
 
 
+# ── Translation helper ────────────────────────────────────────────────────────
+async def translate_to_english(text: str) -> str:
+    """
+    Translate any Urdu text (Arabic script or Roman) into English.
+    This ensures consistent input to the LangGraph pipeline regardless
+    of how Whisper transcribed the audio.
+
+    Returns the original text unchanged if translation fails.
+    """
+    try:
+        response = await openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a translator. The user will give you a question in Urdu "
+                        "(either Arabic script or Roman Urdu). Translate it into clear, "
+                        "natural English. Keep all proper nouns exactly as-is: city names, "
+                        "document names (CNIC, NICOP, B-Form, etc.), and place names. "
+                        "Return ONLY the translated English question — no explanation, "
+                        "no preamble, nothing else."
+                    ),
+                },
+                {"role": "user", "content": text},
+            ],
+            max_tokens=150,
+            temperature=0,
+        )
+        translated = response.choices[0].message.content.strip()
+        print(f"[TRANSLATE] '{text}' → '{translated}'")
+        return translated
+    except Exception as e:
+        print(f"[TRANSLATE Error] {type(e).__name__}: {e} — using original text")
+        return text
+
+
 # ── Shared LangGraph runner ───────────────────────────────────────────────────
 def _run_graph(question: str, mode: str = "text") -> dict:
     """Run LangGraph pipeline synchronously (called in thread pool)"""
@@ -127,7 +164,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
       {"type": "status",     "text": "Thinking..."}
       {"type": "status",     "text": "Searching NADRA knowledge base..."}  ← only if retrieval
       {"type": "status",     "text": "Preparing answer..."}
-      {"type": "transcript", "text": "<transcribed question>"}
+      {"type": "transcript", "text": "<original transcribed question in Urdu>"}
       {"type": "answer",     "text": "<answer text in Urdu>"}
       {"type": "audio",      "data": "<base64 encoded mp3>"}
       {"type": "done"}
@@ -151,25 +188,35 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
                 language="ur",
             )
         os.unlink(tmp_path)
-        question = transcription.text.strip()
+        urdu_question = transcription.text.strip()
 
-        if not question:
+        if not urdu_question:
             yield f"data: {json.dumps({'type': 'error', 'text': 'Could not understand audio. Please try again.'})}\n\n"
             return
 
-        print(f"[STT] Transcribed: {question}")
+        print(f"[STT] Transcribed: {urdu_question}")
 
     except Exception as e:
         print(f"[STT Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Transcription failed: {str(e)}'})}\n\n"
         return
 
-    # ── Step 2: LangGraph pipeline (mode="voice" produces natural Urdu speech) ─
+    # ── Step 2: Translate Urdu → English for reliable retrieval ──────────────
+    # Whisper may output Arabic script Urdu which doesn't match the knowledge
+    # base embeddings (ingested from English/Roman Urdu text files).
+    # Translating to English first ensures consistent, high-quality retrieval.
+    # The graph answer will still be generated in natural Urdu (mode="voice").
+    yield f"data: {json.dumps({'type': 'status', 'text': 'Understanding your question...'})}\n\n"
+    await asyncio.sleep(0)
+
+    english_question = await translate_to_english(urdu_question)
+
+    # ── Step 3: LangGraph pipeline (mode="voice" produces natural Urdu speech) ─
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking...'})}\n\n"
     await asyncio.sleep(0)
 
     try:
-        result = await loop.run_in_executor(None, lambda: _run_graph(question, mode="voice"))
+        result = await loop.run_in_executor(None, lambda: _run_graph(english_question, mode="voice"))
     except Exception as e:
         print(f"[Graph Error] {type(e).__name__}: {e}")
         yield f"data: {json.dumps({'type': 'error', 'text': f'Pipeline failed: {str(e)}'})}\n\n"
@@ -184,7 +231,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
     answer = result.get("answer", "No answer found.")
     print(f"[Graph] Answer ({len(answer)} chars): {answer[:120]}...")
 
-    # ── Step 3: TTS — UpliftAI converts Urdu answer to audio ─────────────────
+    # ── Step 4: TTS — UpliftAI converts Urdu answer to audio ─────────────────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Preparing answer...'})}\n\n"
     await asyncio.sleep(0)
 
@@ -218,7 +265,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
         if tts_response.status_code != 200:
             error_body = tts_response.text
             print(f"[TTS Error] Status {tts_response.status_code} | Body: {error_body}")
-            yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+            yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed [{tts_response.status_code}]: {error_body}'})}\n\n"
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
@@ -229,7 +276,7 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
 
         if len(audio_bytes_out) == 0:
             print("[TTS Error] Empty audio response")
-            yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+            yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error', 'text': 'TTS returned empty audio'})}\n\n"
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
@@ -237,24 +284,26 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str) -> AsyncGenerato
 
     except httpx.TimeoutException:
         print("[TTS Error] Request timed out after 60s")
-        yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+        yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
         yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error', 'text': 'TTS failed: request timed out'})}\n\n"
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
     except Exception as e:
         print(f"[TTS Error] {type(e).__name__}: {e}")
-        yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+        yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
         yield f"data: {json.dumps({'type': 'answer', 'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error', 'text': f'TTS failed: {str(e)}'})}\n\n"
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
 
-    # ── Step 4: Send transcript + answer + audio to Flutter ──────────────────
+    # ── Step 5: Send transcript + answer + audio to Flutter ──────────────────
+    # Note: transcript shows the original Urdu question (what the user said),
+    # not the English translation — so the UI feels natural to the user.
     audio_b64 = base64.b64encode(audio_bytes_out).decode("utf-8")
     print(f"[TTS] Base64 length: {len(audio_b64)} chars — sending to Flutter")
 
-    yield f"data: {json.dumps({'type': 'transcript', 'text': question})}\n\n"
+    yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
     yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
     yield f"data: {json.dumps({'type': 'audio',      'data': audio_b64})}\n\n"
     yield f"data: {json.dumps({'type': 'done'})}\n\n"
