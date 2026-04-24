@@ -142,7 +142,7 @@ class ChatRequest(BaseModel):
 async def run_graph_and_stream(question: str, conversation_id: str, history: list) -> AsyncGenerator[str, None]:
     loop = asyncio.get_event_loop()
 
-    # Send conversation_id immediately so Flutter can store it
+    # Send conversation_id immediately so client can store it for subsequent requests
     yield f"data: {json.dumps({'type': 'conversation_id', 'id': conversation_id})}\n\n"
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking…'})}\n\n"
     await asyncio.sleep(0)
@@ -171,14 +171,15 @@ async def run_graph_and_stream(question: str, conversation_id: str, history: lis
         yield f"data: {json.dumps({'type': 'token', 'text': token})}\n\n"
         await asyncio.sleep(0.02)
 
-    yield f"data: {json.dumps({'type': 'done'})}\n\n"
-
-    # Persist conversation asynchronously (don't block the stream)
+    # ── FIX: Save BEFORE yielding done so it always executes even if client
+    # disconnects immediately after receiving the done event.
     is_first = len(history) == 0
     await loop.run_in_executor(
         None,
         lambda: save_turn(conversation_id, question, answer, is_first_turn=is_first),
     )
+
+    yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
 
 @app.post("/chat")
@@ -296,6 +297,12 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str, conversation_id:
             yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error',      'text': f'TTS failed [{tts_response.status_code}]'})}\n\n"
+            # ── FIX: Save even on TTS failure so conversation history is preserved
+            is_first = len(history) == 0
+            await loop.run_in_executor(
+                None,
+                lambda: save_turn(conversation_id, urdu_question, answer, is_first_turn=is_first),
+            )
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
             return
 
@@ -304,6 +311,12 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str, conversation_id:
             yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
             yield f"data: {json.dumps({'type': 'error',      'text': 'TTS returned empty audio'})}\n\n"
+            # ── FIX: Save even on empty audio so conversation history is preserved
+            is_first = len(history) == 0
+            await loop.run_in_executor(
+                None,
+                lambda: save_turn(conversation_id, urdu_question, answer, is_first_turn=is_first),
+            )
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
             return
 
@@ -311,28 +324,42 @@ async def run_voice_pipeline(audio_bytes: bytes, filename: str, conversation_id:
         yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
         yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error',      'text': 'TTS failed: request timed out'})}\n\n"
+        # ── FIX: Save even on timeout so conversation history is preserved
+        is_first = len(history) == 0
+        await loop.run_in_executor(
+            None,
+            lambda: save_turn(conversation_id, urdu_question, answer, is_first_turn=is_first),
+        )
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
     except Exception as e:
         yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
         yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
         yield f"data: {json.dumps({'type': 'error',      'text': f'TTS failed: {str(e)}'})}\n\n"
+        # ── FIX: Save even on exception so conversation history is preserved
+        is_first = len(history) == 0
+        await loop.run_in_executor(
+            None,
+            lambda: save_turn(conversation_id, urdu_question, answer, is_first_turn=is_first),
+        )
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
 
-    # ── Step 5: Send everything to Flutter ────────────────────────────────────
+    # ── Step 5: Send everything to client ─────────────────────────────────────
     audio_b64 = base64.b64encode(audio_bytes_out).decode("utf-8")
     yield f"data: {json.dumps({'type': 'transcript', 'text': urdu_question})}\n\n"
     yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
     yield f"data: {json.dumps({'type': 'audio',      'data': audio_b64})}\n\n"
-    yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
-    # Persist conversation
+    # ── FIX: Save BEFORE yielding done so it always executes even if client
+    # disconnects immediately after receiving the audio/done event.
     is_first = len(history) == 0
     await loop.run_in_executor(
         None,
         lambda: save_turn(conversation_id, urdu_question, answer, is_first_turn=is_first),
     )
+
+    yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
 
 @app.post("/voice")
