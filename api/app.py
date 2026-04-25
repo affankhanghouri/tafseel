@@ -58,6 +58,14 @@ UPLIFTAI_API_KEY  = os.getenv("UPLIFTAI_API_KEY")
 UPLIFTAI_TTS_URL  = "https://api.upliftai.org/v1/synthesis/text-to-speech"
 UPLIFTAI_VOICE_ID = os.getenv("UPLIFTAI_VOICE_ID", "v_8eelc901")
 
+# Per-language voice IDs from Uplift AI Orator docs (https://docs.upliftai.org/orator_voices)
+# Falls back to UPLIFTAI_VOICE_ID (Urdu) for any unmapped language (e.g. English)
+LANGUAGE_VOICE_MAP = {
+    "urdu":    UPLIFTAI_VOICE_ID,       # v_8eelc901 — Info/Education Urdu
+    "sindhi":  "v_sd6mn4p2",            # Male Calm Sindhi
+    "balochi": "v_bl0ab8c4",            # Best Balochi male TTS
+}
+
 
 # ── Startup ───────────────────────────────────────────────────────────────────
 @app.on_event("startup")
@@ -315,31 +323,43 @@ async def run_voice_pipeline(
         )
 
     try:
-        async with httpx.AsyncClient(timeout=60) as client:
-            tts_response = await client.post(
-                UPLIFTAI_TTS_URL,
-                headers={
-                    "Authorization": f"Bearer {UPLIFTAI_API_KEY}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "voiceId": UPLIFTAI_VOICE_ID,
-                    "text": tts_text,
-                    "outputFormat": "MP3_22050_32",
-                },
+        if language == "english":
+            # ── OpenAI TTS for English ────────────────────────────────────────
+            tts_resp = await openai_client.audio.speech.create(
+                model="tts-1",
+                voice="nova",
+                input=tts_text,
+                response_format="mp3",
             )
+            audio_bytes_out = tts_resp.content
+        else:
+            # ── Uplift AI Orator for Urdu / Sindhi / Balochi ──────────────────
+            async with httpx.AsyncClient(timeout=60) as client:
+                tts_response = await client.post(
+                    UPLIFTAI_TTS_URL,
+                    headers={
+                        "Authorization": f"Bearer {UPLIFTAI_API_KEY}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "voiceId": LANGUAGE_VOICE_MAP.get(language, UPLIFTAI_VOICE_ID),
+                        "text": tts_text,
+                        "outputFormat": "MP3_22050_32",
+                    },
+                )
 
-        if tts_response.status_code != 200:
-            error_body = tts_response.text
-            logger.error(f"[TTS Error] Status {tts_response.status_code} | {error_body}")
-            yield f"data: {json.dumps({'type': 'transcript', 'text': spoken_question})}\n\n"
-            yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
-            yield f"data: {json.dumps({'type': 'error',      'text': f'TTS failed [{tts_response.status_code}]'})}\n\n"
-            await _save_turn()
-            yield f"data: {json.dumps({'type': 'done'})}\n\n"
-            return
+            if tts_response.status_code != 200:
+                error_body = tts_response.text
+                logger.error(f"[TTS Error] Status {tts_response.status_code} | {error_body}")
+                yield f"data: {json.dumps({'type': 'transcript', 'text': spoken_question})}\n\n"
+                yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
+                yield f"data: {json.dumps({'type': 'error',      'text': f'TTS failed [{tts_response.status_code}]'})}\n\n"
+                await _save_turn()
+                yield f"data: {json.dumps({'type': 'done'})}\n\n"
+                return
 
-        audio_bytes_out = tts_response.content
+            audio_bytes_out = tts_response.content
+
         if len(audio_bytes_out) == 0:
             yield f"data: {json.dumps({'type': 'transcript', 'text': spoken_question})}\n\n"
             yield f"data: {json.dumps({'type': 'answer',     'text': answer})}\n\n"
