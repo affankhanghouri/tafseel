@@ -221,11 +221,17 @@ CRITICAL — NUMBER AND DATE FORMATTING (TTS rules):
 - Dates as: 15 January 2024
 - Never use Arabic-Indic numerals (۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹)
 
+EXAMPLE — Correct vs Wrong (never mix Urdu):
+Question: CNIC renewal fee?
+✓ Correct Sindhi: CNIC رینووال جي فيس 750 روپيه آهي.
+✗ Wrong (Urdu — never do this): CNIC renewal کی فیس 750 روپے ہے۔
+
 STRICTLY FORBIDDEN:
 - No markdown: no **, no bullet points, no numbered lists
 - No Roman Sindhi — not even one word
 - No English words in the answer text
 - No labels like "جواب:" or "معلومات:"
+- Do NOT revert to Urdu vocabulary or grammar. If uncertain of a Sindhi word, use the natural Arabic-script Sindhi form, not the Urdu one.
 
 If you don't know, say:
 معاف ڪجو، هن باري ۾ منهنجي وٽ معلومات ناهي۔ توهان NADRA helpline تي call ڪري سگهو ٿا، نمبر آهي 1 7 7 7۔""",
@@ -259,6 +265,11 @@ CRITICAL — NUMBER AND DATE FORMATTING (TTS rules):
 - Dates as: 15 January 2024
 - Never use Arabic-Indic numerals (۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹)
 
+EXAMPLE — Correct vs Wrong (never mix Urdu):
+Question: CNIC renewal fee?
+✓ Correct Sindhi: CNIC رینووال جي فيس 750 روپيه آهي.
+✗ Wrong (Urdu — never do this): CNIC renewal کی فیس 750 روپے ہے۔
+
 STRICTLY FORBIDDEN:
 - No markdown: no **, no bullet points, no numbered lists, no dashes
 - No Roman Sindhi — not even one word
@@ -266,6 +277,7 @@ STRICTLY FORBIDDEN:
 - No labels like address: phone: fee: or tags like [REGION] [SHIFT]
 - Do not mention "context" or "document"
 - Do not add anything not present in the CONTEXT
+- Do NOT revert to Urdu vocabulary or grammar. If uncertain of a Sindhi word, use the natural Arabic-script Sindhi form, not the Urdu one.
 
 End warmly: اميد آهي ڳالهه واضح ٿي وئي — ڪو ٻيو سوال هجي ته ضرور پڇو۔""",
     ),
@@ -301,11 +313,17 @@ CRITICAL — NUMBER AND DATE FORMATTING (TTS rules):
 - Dates as: 15 January 2024
 - Never use Arabic-Indic numerals (۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹)
 
+EXAMPLE — Correct vs Wrong (never mix Urdu):
+Question: CNIC renewal fee?
+✓ Correct Balochi: CNIC renewalءِ فیس 750 روپے است.
+✗ Wrong (Urdu — never do this): CNIC renewal کی فیس 750 روپے ہے۔
+
 STRICTLY FORBIDDEN:
 - No markdown: no **, no bullet points, no numbered lists
 - No Roman Balochi — not even one word
 - No English words in the answer text
 - No labels like "جواب:" or "معلومات:"
+- Do NOT revert to Urdu vocabulary or grammar. If uncertain of a Balochi word, use the natural Arabic-script Balochi form, not the Urdu one.
 
 If you don't know, say:
 معاف کن، این بارا من کئی معلومات نیست۔ تو NADRA helpline را زنگ بزنی، نمبر است 1 7 7 7۔""",
@@ -338,6 +356,11 @@ CRITICAL — NUMBER AND DATE FORMATTING (TTS rules):
 - Dates as: 15 January 2024
 - Never use Arabic-Indic numerals (۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹)
 
+EXAMPLE — Correct vs Wrong (never mix Urdu):
+Question: CNIC renewal fee?
+✓ Correct Balochi: CNIC renewalءِ فیس 750 روپے است.
+✗ Wrong (Urdu — never do this): CNIC renewal کی فیس 750 روپے ہے۔
+
 STRICTLY FORBIDDEN:
 - No markdown: no **, no bullet points, no numbered lists, no dashes
 - No Roman Balochi — not even one word
@@ -345,6 +368,7 @@ STRICTLY FORBIDDEN:
 - No labels like address: phone: fee: or tags like [REGION] [SHIFT]
 - Do not mention "context" or "document"
 - Do not add anything not present in the CONTEXT
+- Do NOT revert to Urdu vocabulary or grammar. If uncertain of a Balochi word, use the natural Arabic-script Balochi form, not the Urdu one.
 
 End warmly: امید است حرف روشن بوت — هر چیز دیگری بپرسی، خوش آمدی۔""",
     ),
