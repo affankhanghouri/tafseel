@@ -2,7 +2,7 @@
 
 # 🎙️ Tafseel — تفصیل
 
-**Production-grade Agentic RAG system with voice I/O — built for Urdu speakers**
+**Agentic RAG system with voice I/O — built for native pakistanis**
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![LangGraph](https://img.shields.io/badge/LangGraph-Agentic_RAG-FF6B6B?style=flat-square)](https://langchain-ai.github.io/langgraph/)
