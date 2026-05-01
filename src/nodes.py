@@ -24,7 +24,7 @@ from src.ingestion import get_retriever
 
 logger = logging.getLogger(__name__)
 
-HISTORY_WINDOW = 5   # last 5 user+assistant turns passed to generation nodes
+HISTORY_WINDOW = 5   # last 5 turns (user+assistant pairs) passed to generation nodes
 
 # Supported languages — fallback to urdu if unknown
 SUPPORTED_LANGUAGES = {"urdu", "sindhi", "balochi", "english"}
@@ -124,8 +124,8 @@ def _grade_single_doc(doc: Document, question: str):
         )
         return doc, decision.is_relevant
     except Exception as e:
-        logger.warning(f"[is_relevant] Grading failed (keeping doc): {e}")
-        return doc, True   # safe default: keep rather than discard
+        logger.warning(f"[is_relevant] Grading failed — excluding doc (accuracy > recall): {e}")
+        return doc, False   # fail safe: exclude rather than risk a hallucinated answer
 
 
 def is_relevant(state: MyState):

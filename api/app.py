@@ -72,8 +72,7 @@ LANGUAGE_VOICE_MAP = {
 async def startup_event():
     """Ensure conversation tables exist on startup."""
     try:
-        loop = asyncio.get_event_loop()
-        await loop.run_in_executor(None, init_conversation_tables)
+        await asyncio.to_thread(init_conversation_tables)
         logger.info("✅ Conversation tables initialised")
     except Exception as e:
         logger.error(f"⚠️  Could not init conversation tables: {e}")
@@ -119,6 +118,25 @@ async def translate_to_english(text: str, source_language: str = "Urdu") -> str:
         return text
 
 
+def _decide_retrieval_only(question: str) -> bool:
+    """
+    Run ONLY the decide_retrieval node synchronously — no full graph invocation.
+    Used by the voice pipeline to route before deciding whether to translate,
+    saving a GPT-4o-mini API call + ~500ms on every non-NADRA query.
+    Falls back to True (retrieval) on any error — safer than skipping retrieval.
+    """
+    from src.routing import decision_llm
+    from src.prompts import decide_retrieval_prompt
+    try:
+        decision = decision_llm.invoke(
+            decide_retrieval_prompt.format_messages(question=question)
+        )
+        return decision.need_retrieval
+    except Exception as e:
+        logger.warning(f"[_decide_retrieval_only] Failed: {e} — defaulting to True")
+        return True
+
+
 def _run_graph(question: str, mode: str, language: str, history: list) -> dict:
     """Run LangGraph pipeline synchronously (called in thread pool)."""
     return nia_graph.invoke({
@@ -156,17 +174,14 @@ async def run_graph_and_stream(
     language: str,
     history: list,
 ) -> AsyncGenerator[str, None]:
-    loop = asyncio.get_event_loop()
-
     # Send conversation_id immediately so client stores it for subsequent turns.
     yield f"data: {json.dumps({'type': 'conversation_id', 'id': conversation_id})}\n\n"
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking…'})}\n\n"
     await asyncio.sleep(0)
 
     try:
-        result = await loop.run_in_executor(
-            None,
-            lambda: _run_graph(question, "text", language, history),
+        result = await asyncio.to_thread(
+            _run_graph, question, "text", language, history
         )
     except Exception as e:
         logger.error(f"[/chat graph error] {e}")
@@ -192,9 +207,8 @@ async def run_graph_and_stream(
 
     # Save BEFORE yielding done so it always executes even if client disconnects.
     is_first = len(history) == 0
-    await loop.run_in_executor(
-        None,
-        lambda: save_turn(conversation_id, question, answer, is_first_turn=is_first),
+    await asyncio.to_thread(
+        save_turn, conversation_id, question, answer, is_first
     )
 
     yield f"data: {json.dumps({'type': 'done'})}\n\n"
@@ -202,19 +216,14 @@ async def run_graph_and_stream(
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
-    loop = asyncio.get_event_loop()
     language = request.language or "english"
 
     # Resolve or create backend conversation; fetch its stored history.
     if request.conversation_id:
         conv_id = request.conversation_id
-        history = await loop.run_in_executor(
-            None, lambda: get_conversation_history(conv_id)
-        )
+        history = await asyncio.to_thread(get_conversation_history, conv_id)
     else:
-        conv_id = await loop.run_in_executor(
-            None, lambda: create_conversation(mode="text")
-        )
+        conv_id = await asyncio.to_thread(create_conversation, "text")
         history = []
 
     return StreamingResponse(
@@ -232,8 +241,6 @@ async def run_voice_pipeline(
     language: str,
     history: list,
 ) -> AsyncGenerator[str, None]:
-    loop = asyncio.get_event_loop()
-
     yield f"data: {json.dumps({'type': 'conversation_id', 'id': conversation_id})}\n\n"
 
     # ── Step 1: STT ───────────────────────────────────────────────────────────
@@ -246,15 +253,28 @@ async def run_voice_pipeline(
             tmp.write(audio_bytes)
             tmp_path = tmp.name
 
-        # FIX: Whisper handles Arabic-script audio best when hinted with "ur".
-        # Sindhi and Balochi are also Arabic-script, so we use "ur" for all three.
-        stt_lang = "ur" if language in ("urdu", "sindhi", "balochi") else "en"
+        # Whisper language hints — each language gets correct treatment:
+        #   "ur" → Urdu:    Whisper has a dedicated Urdu model, correct hint
+        #   "sd" → Sindhi:  ISO-639 code; Whisper has real Sindhi support,
+        #                   better than being force-fit through "ur"
+        #   None → Balochi: Whisper has NO Balochi model. "ur" actively hurts
+        #                   because Balochi phonology is closer to Persian/Brahui.
+        #                   None = omit parameter entirely = auto-detect, which
+        #                   consistently beats a wrong hint.
+        #   "en" → English: standard
+        STT_LANG_MAP = {
+            "urdu":    "ur",
+            "sindhi":  "sd",
+            "balochi": None,   # auto-detect beats a wrong hint
+            "english": "en",
+        }
+        stt_lang = STT_LANG_MAP.get(language, "ur")
 
         with open(tmp_path, "rb") as audio_file:
             transcription = await openai_client.audio.transcriptions.create(
                 model="whisper-1",
                 file=audio_file,
-                language=stt_lang,
+                **({"language": stt_lang} if stt_lang is not None else {}),
             )
         os.unlink(tmp_path)
         spoken_question = transcription.text.strip()
@@ -272,27 +292,35 @@ async def run_voice_pipeline(
         yield f"data: {json.dumps({'type': 'done'})}\n\n"
         return
 
-    # ── Step 2: Translate to English only if needed for retrieval ─────────────
+    # ── Step 2: Route first — translate only if retrieval is needed ──────────
+    # Calling decide_retrieval on the raw spoken text avoids paying for a
+    # GPT-4o-mini translation on every greeting or general question ("hello",
+    # "shukriya", etc.). Translation is expensive and adds ~500ms — skip it
+    # whenever the graph would go straight to generate_direct anyway.
     yield f"data: {json.dumps({'type': 'status', 'text': 'Understanding your question...'})}\n\n"
     await asyncio.sleep(0)
 
-    if _is_arabic_script(spoken_question):
-        # FIX: pass the real source language so the translator doesn't assume Urdu
+    needs_retrieval = await asyncio.to_thread(_decide_retrieval_only, spoken_question)
+
+    if needs_retrieval and _is_arabic_script(spoken_question):
+        # Only translate when we are about to hit the vector store
         english_question = await translate_to_english(
             spoken_question, source_language=language.capitalize()
         )
     else:
         english_question = spoken_question
-        logger.info("[TRANSLATE] Skipped — no Arabic script detected")
+        if not needs_retrieval:
+            logger.info("[TRANSLATE] Skipped — direct generation path, no retrieval needed")
+        else:
+            logger.info("[TRANSLATE] Skipped — no Arabic script detected")
 
     # ── Step 3: LangGraph pipeline ────────────────────────────────────────────
     yield f"data: {json.dumps({'type': 'status', 'text': 'Thinking...'})}\n\n"
     await asyncio.sleep(0)
 
     try:
-        result = await loop.run_in_executor(
-            None,
-            lambda: _run_graph(english_question, "voice", language, history),
+        result = await asyncio.to_thread(
+            _run_graph, english_question, "voice", language, history
         )
     except Exception as e:
         logger.error(f"[Graph Error] {type(e).__name__}: {e}")
@@ -317,9 +345,8 @@ async def run_voice_pipeline(
 
     async def _save_turn():
         is_first = len(history) == 0
-        await loop.run_in_executor(
-            None,
-            lambda: save_turn(conversation_id, spoken_question, answer, is_first_turn=is_first),
+        await asyncio.to_thread(
+            save_turn, conversation_id, spoken_question, answer, is_first
         )
 
     try:
@@ -400,7 +427,6 @@ async def voice(
     conversation_id: Optional[str] = Form(default=None),
     language: str = Form(default="urdu"),
 ):
-    loop = asyncio.get_event_loop()
     audio_bytes = await file.read()
     logger.info(
         f"[Voice] file={file.filename} size={len(audio_bytes)} bytes "
@@ -409,13 +435,9 @@ async def voice(
 
     # Resolve or create backend conversation; fetch its stored history.
     if conversation_id:
-        history = await loop.run_in_executor(
-            None, lambda: get_conversation_history(conversation_id)
-        )
+        history = await asyncio.to_thread(get_conversation_history, conversation_id)
     else:
-        conversation_id = await loop.run_in_executor(
-            None, lambda: create_conversation(mode="voice")
-        )
+        conversation_id = await asyncio.to_thread(create_conversation, "voice")
         history = []
 
     return StreamingResponse(
@@ -438,15 +460,13 @@ async def voice(
 # ── Conversation history endpoints ────────────────────────────────────────────
 @app.get("/conversations")
 async def get_conversations(limit: int = 50):
-    loop = asyncio.get_event_loop()
-    conversations = await loop.run_in_executor(None, lambda: list_conversations(limit))
+    conversations = await asyncio.to_thread(list_conversations, limit)
     return {"conversations": conversations}
 
 
 @app.get("/conversations/{conversation_id}")
 async def get_conversation(conversation_id: str):
-    loop = asyncio.get_event_loop()
-    conv = await loop.run_in_executor(None, lambda: get_full_conversation(conversation_id))
+    conv = await asyncio.to_thread(get_full_conversation, conversation_id)
     if not conv:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return conv
@@ -454,8 +474,7 @@ async def get_conversation(conversation_id: str):
 
 @app.delete("/conversations/{conversation_id}")
 async def remove_conversation(conversation_id: str):
-    loop = asyncio.get_event_loop()
-    deleted = await loop.run_in_executor(None, lambda: delete_conversation(conversation_id))
+    deleted = await asyncio.to_thread(delete_conversation, conversation_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return {"deleted": True, "id": conversation_id}

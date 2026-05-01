@@ -488,19 +488,25 @@ is_relevant_prompt = ChatPromptTemplate.from_messages([
         "system",
         """You are a document relevance judge for a NADRA assistant system.
 
-Your task: Decide if the document is relevant to the user's question at the TOPIC level.
-A document is relevant if it covers the same subject area — it does NOT need to have the exact answer.
+Your task: Decide if the document contains information that could genuinely help answer the user's question.
 
 MARK RELEVANT (is_relevant = true) if:
 - The document discusses the same NADRA service, document type, or process as the question
-- The document covers the same topic area (e.g., CNIC info is relevant to CNIC questions)
-- The document contains supporting context that could help answer the question
+- The document contains fees, timelines, required documents, eligibility criteria, or procedures
+  that directly apply to what the user asked
+- The document covers the same topic area with meaningful overlap (e.g., CNIC renewal info
+  is relevant to a CNIC renewal question)
 
-MARK NOT RELEVANT (is_relevant = false) ONLY if:
-- The document is clearly about a completely different NADRA service or topic
-- There is zero topical overlap
+MARK NOT RELEVANT (is_relevant = false) if:
+- The document is about a clearly different NADRA service or topic with no meaningful overlap
+- The document is generic background with no actionable info for this specific question
+- There is only superficial keyword overlap but no substantive topical connection
 
-When uncertain → always choose true. Stricter filtering happens at the IsSUP stage.
+IMPORTANT: This is a government assistant where accuracy matters more than recall.
+A wrong answer is worse than no answer. Be genuinely critical — do not pass documents
+through on vague similarity alone. If the document cannot contribute meaningfully to
+answering this specific question, mark it not relevant. Stricter grading here means
+fewer hallucinations downstream.
 
 Return JSON matching the schema.""",
     ),
@@ -621,7 +627,13 @@ RULES:
 - Keep all key entities: CNIC, NICOP, POC, NADRA, Juvenile Card, B-Form, CRC, FRC, etc.
 - Add 2–4 high-signal keywords likely to appear in NADRA policy documents.
 - Remove conversational filler ("mere", "mujhe", "please", "bata do", "kya hai").
-- Do NOT include the previous query if it failed — generate a meaningfully different angle.
+- CRITICAL — SEMANTIC DIVERSITY: You will be shown the previous retrieval query that already failed.
+  You MUST generate a meaningfully different query — different keywords, different angle, different
+  aspect of the topic. Do NOT paraphrase the previous query. If the previous query focused on
+  "process and steps", try "fees and documents". If it focused on "requirements", try "office locations
+  or contact". Approach the topic from a completely fresh angle.
+- You will also see a summary of why the previous answer failed — use this to understand what
+  information is still missing and target that gap specifically.
 - Do NOT answer the question.
 - Output JSON with key: retrieval_query
 
@@ -640,6 +652,13 @@ Q: "kitni fees lagti hain CNIC renewal mein"
     ),
     (
         "human",
-        "QUESTION:\n{question}\n\nPrevious retrieval query (if any):\n{retrieval_query}\n\nPrevious answer (if any):\n{answer}",
+        """QUESTION:
+{question}
+
+Previous retrieval query that FAILED (do NOT paraphrase this — choose a different angle):
+{retrieval_query}
+
+Why the previous answer was insufficient (target this gap):
+{answer}""",
     ),
 ])

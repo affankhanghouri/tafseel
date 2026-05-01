@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 
 _pg_pool = None
 MAX_TITLE_LENGTH = 60
-HISTORY_WINDOW = 15   # max messages fetched for LLM context (5 turns)
+HISTORY_WINDOW = 5    # max TURNS (user+assistant pairs) fetched for LLM context
+# Each turn = 2 messages, so we fetch HISTORY_WINDOW * 2 from the DB.
+# Turn-based counting ensures a single long message cannot displace recent turns.
 
 
 def _get_pool():
@@ -146,10 +148,11 @@ def save_turn(
         pool.putconn(conn)
 
 
-def get_conversation_history(conversation_id: str, limit: int = HISTORY_WINDOW) -> List[dict]:
+def get_conversation_history(conversation_id: str, max_turns: int = HISTORY_WINDOW) -> List[dict]:
     """
-    Fetch the last `limit` messages for a conversation.
+    Fetch the last `max_turns` complete turns (user+assistant pairs).
     Returns list of {role, content} dicts ordered oldest→newest.
+    Turn-based limit prevents a single verbose message from crowding out recent turns.
     """
     pool = _get_pool()
     conn = pool.getconn()
@@ -165,7 +168,7 @@ def get_conversation_history(conversation_id: str, limit: int = HISTORY_WINDOW) 
                     LIMIT %s
                 ) sub ORDER BY created_at ASC
                 """,
-                (conversation_id, limit),
+                (conversation_id, max_turns * 2),   # 2 messages per turn
             )
             rows = cur.fetchall()
             return [{"role": row["role"], "content": row["content"]} for row in rows]
