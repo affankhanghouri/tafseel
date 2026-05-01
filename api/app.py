@@ -253,19 +253,20 @@ async def run_voice_pipeline(
             tmp.write(audio_bytes)
             tmp_path = tmp.name
 
-        # Whisper language hints — each language gets correct treatment:
-        #   "ur" → Urdu:    Whisper has a dedicated Urdu model, correct hint
-        #   "sd" → Sindhi:  ISO-639 code; Whisper has real Sindhi support,
-        #                   better than being force-fit through "ur"
-        #   None → Balochi: Whisper has NO Balochi model. "ur" actively hurts
-        #                   because Balochi phonology is closer to Persian/Brahui.
-        #                   None = omit parameter entirely = auto-detect, which
-        #                   consistently beats a wrong hint.
+        # Whisper language hints — only pass codes the whisper-1 API actually accepts.
+        # The open-source Whisper tokenizer defines "sd" for Sindhi, but the hosted
+        # whisper-1 API endpoint rejects it with an unsupported language error.
+        # Official well-performing languages per OpenAI docs include Urdu but not Sindhi.
+        #
+        #   "ur" → Urdu:    officially supported, correct hint
+        #   None → Sindhi:  "sd" is rejected by the API — auto-detect performs better
+        #                   than forcing "ur" (wrong phonology) or "sd" (rejected)
+        #   None → Balochi: no Whisper model exists at all — auto-detect is the only option
         #   "en" → English: standard
         STT_LANG_MAP = {
             "urdu":    "ur",
-            "sindhi":  "sd",
-            "balochi": None,   # auto-detect beats a wrong hint
+            "sindhi":  None,   # "sd" rejected by whisper-1 API; auto-detect beats "ur"
+            "balochi": None,   # no Balochi model; auto-detect beats a wrong hint
             "english": "en",
         }
         stt_lang = STT_LANG_MAP.get(language, "ur")
